@@ -7,11 +7,11 @@
 
 #include <stdio.h>
 
-#define _showElement(x) printf(x)
+#define showElement(x) printf(x)
 #ifdef UNICODE_DISPLAY
-#define SHOW_FLAG() _showElement("\u2691")
+#define SHOW_FLAG() showElement("\u2691")
 #else
-#define SHOW_FLAG() _showElement("D")
+#define SHOW_FLAG() showElement("D")
 #endif
 
 #ifdef WINDOWS

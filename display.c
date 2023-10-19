@@ -63,6 +63,6 @@ int main()
 {
     initializeDisplay();
     print_cell(1);
-    printf("\e[1;31m \u2691 💣 • ◮ ☐");
+    printf("\e[1;31m \u2691 💣 ⬤ • ◮ ☐");
     return 0;
 }

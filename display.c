@@ -131,19 +131,19 @@ char *print_cell(int type, int isCursor)
 
     if (type == -2)
     {
-        sprintf(result+position, "%s%s%s", foregroundColors[1], SHOW_FLAG(), foregroundColors[0]);
+        sprintf(result + position, "%s%s%s", foregroundColors[1], SHOW_FLAG(), foregroundColors[0]);
     }
     else if (type == BOMB)
     {
-        sprintf(result+position, "%s%s%s", foregroundColors[2], SHOW_BOMB(), foregroundColors[0]);
+        sprintf(result + position, "%s%s%s", foregroundColors[2], SHOW_BOMB(), foregroundColors[0]);
     }
     else if (type == 0)
     {
-        sprintf(result+position, "  %s", foregroundColors[0]);
+        sprintf(result + position, "  %s", foregroundColors[0]);
     }
     else
     {
-        sprintf(result+position, "%s%d %s", foregroundColors[type + 2], type, foregroundColors[0]);
+        sprintf(result + position, "%s%d %s", foregroundColors[type + 2], type, foregroundColors[0]);
     }
     return result;
 }
@@ -158,20 +158,17 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
         if (i != 0)
         {
             position = sprintf(content[i], "\n");
-            // printf("\n");
         }
         for (int j = 0; j < width; j++)
         {
             int isCursor = (i == cursorY && j == cursorX);
-            if (displayGrid[i*width+j] == FLAG)
+            if (displayGrid[i * width + j] == FLAG)
             {
-                position += sprintf(content[i]+position, "%s", print_cell(-2, isCursor));
-                // printf("%s", print_cell(-2, isCursor));
+                position += sprintf(content[i] + position, "%s", print_cell(-2, isCursor));
             }
-            else if (displayGrid[i*width+j] == SHOWED_CELL)
+            else if (displayGrid[i * width + j] == SHOWED_CELL)
             {
-                position += sprintf(content[i]+position, "%s", print_cell(contentGrid[i*width+j], isCursor));
-                // printf("%s", print_cell(contentGrid[i*width+j], isCursor));
+                position += sprintf(content[i] + position, "%s", print_cell(contentGrid[i * width + j], isCursor));
             }
             else
             {
@@ -180,19 +177,18 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
                     c = backgroundColors[3];
                 else
                     c = backgroundColors[2];
-                position += sprintf(content[i]+position, "%s  %s", c, foregroundColors[0]);
-                // printf("%s  %s", c, foregroundColors[0]);
+                position += sprintf(content[i] + position, "%s  %s", c, foregroundColors[0]);
             }
         }
     }
     // Flatten content
     char *result = (char *)malloc(height * width * 100 * sizeof(char));
-    int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J");// Clear screen, hide cursor
+    int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J"); // Clear screen, hide cursor
     for (int i = 0; i < height; i++)
     {
-        position += sprintf(result+position, "%s", content[i]);
+        position += sprintf(result + position, "%s", content[i]);
     }
-    position += sprintf(result+position, "\n");// Show cursor
+    position += sprintf(result + position, "\n"); // Show cursor
     // Finally, show the entire grid in one call
     puts(result);
     return 0;
@@ -215,18 +211,26 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         if (input == 'd')
         {
             x++;
+            if (x >= width)
+                x = width - 1;
         }
         else if (input == 'q')
         {
             x--;
+            if (x < 0)
+                x = 0;
         }
         else if (input == 'z')
         {
             y--;
+            if (y < 0)
+                y = 0;
         }
         else if (input == 's')
         {
             y++;
+            if (y >= height)
+                y = height - 1;
         }
         else if (input == 3)
         {
@@ -255,7 +259,7 @@ int main()
         for (int j = 0; j < width; j++)
         {
             // random content
-            contentGrid[i*width + j] = rand() % 9;
+            contentGrid[i * width + j] = rand() % 9;
         }
     }
     int *displayGrid = (int *)malloc(width * height * sizeof(int *));
@@ -263,7 +267,7 @@ int main()
     {
         for (int j = 0; j < width; j++)
         {
-            displayGrid[i*width+j] = HIDDEN_CELL;
+            displayGrid[i * width + j] = HIDDEN_CELL;
         }
     }
     // add random bombs and flags
@@ -273,7 +277,7 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add bomb
-        contentGrid[y*width+x] = BOMB;
+        contentGrid[y * width + x] = BOMB;
     }
     for (int i = 0; i < 10; i++)
     {
@@ -281,7 +285,7 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add flag
-        displayGrid[y*width+x] = FLAG;
+        displayGrid[y * width + x] = FLAG;
     }
 
     // Show random numbers
@@ -291,7 +295,7 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add flag
-        displayGrid[y*width+x] = SHOWED_CELL;
+        displayGrid[y * width + x] = SHOWED_CELL;
     }
 
     int x, y, action;

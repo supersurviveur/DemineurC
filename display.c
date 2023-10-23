@@ -1,8 +1,11 @@
-#define WINDOWS // To remove if we are not on windows
+#define WINDOWS         // To remove if we are not on windows
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
 
 #ifdef WINDOWS
 #include <windows.h>
+#include <conio.h>
+#else
+#include <termios.h>
 #endif
 
 #include "constants.h"
@@ -22,7 +25,7 @@ char *foregroundColors[] = {
     "\e[0m", // RESET
 
     // FOREGROUND
-    "\e[1;31m", // FLAG
+    "\e[1;31m",            // FLAG
     "\e[1m\e[38;2;0;0;0m", // BOMB
     // NUMBERS
     // 1 #0101FF
@@ -42,13 +45,13 @@ char *foregroundColors[] = {
     // 8 #818181
     "\e[1m\e[38;2;129;129;129m",
 
-
 };
 char *backgroundColors[] = {
     "\e[0m", // RESET
     // BACKGROUND
     "\e[48;2;240;240;240m", // SHOWED_CELL
     "\e[48;2;180;180;180m", // HIDDEN_CELL
+    "\e[48;2;100;100;100m", // CURRENT_CELL
 
 };
 
@@ -75,6 +78,25 @@ int initializeWindowsConsole()
     }
     return 0;
 }
+#else
+int _getch(void)
+{
+    int ch;
+    struct termios oldt;
+    struct termios newt;
+
+    tcgetattr(STDIN_FILENO, &oldt);   /*store old settings */
+    newt = oldt;                      /* copy old settings to new settings */
+    newt.c_lflag &= ~(ICANON | ECHO); /* make one change to old settings in new settings */
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt); /*apply the new settings immediatly */
+
+    ch = getchar(); /* standard getchar call */
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); /*reapply the old settings */
+
+    return ch; /*return received char */
+}
 #endif
 
 int initializeDisplay()
@@ -89,49 +111,109 @@ int initializeDisplay()
     return 0;
 }
 
-void print_cell(int type)
+void print_cell(int type, int isCursor)
 {
+    if (isCursor)
+        printf("%s", backgroundColors[3]);
+    else
+        printf("%s", backgroundColors[1]);
+
     if (type == -2)
     {
-        printf("%s", backgroundColors[1]);
         printf("%s", foregroundColors[1]);
         SHOW_FLAG();
         printf("%s", foregroundColors[0]);
-    } else if (type == BOMB) {
-        printf("%s", backgroundColors[1]);
+    }
+    else if (type == BOMB)
+    {
         printf("%s", foregroundColors[2]);
         SHOW_BOMB();
         printf("%s", foregroundColors[0]);
-    } else if (type == 0) {
-        printf("%s", backgroundColors[1]);
+    }
+    else if (type == 0)
+    {
         printf("  ");
         printf("%s", foregroundColors[0]);
-    } else {
-        printf("%s", backgroundColors[1]);
+    }
+    else
+    {
         printf("%s", foregroundColors[type + 2]);
         printf("%d ", type);
         printf("%s", foregroundColors[0]);
     }
 }
 
-int showGameGrid(int **contentGrid, int **displayGrid, int width, int height)
+int showGameGrid(int **contentGrid, int **displayGrid, int width, int height, int cursorX, int cursorY)
 {
-    // Clear screen
-    printf("\e[1;1H\e[2J");
+    // char **content = (char **)malloc(height * sizeof(char *));
     for (int i = 0; i < height; i++)
     {
-        printf("\n");
+        if (i != 0)
+        {
+            printf("\n");
+        }
         for (int j = 0; j < width; j++)
         {
-            if (displayGrid[i][j] == FLAG) {
-                print_cell(-2);
-            } else if (displayGrid[i][j] == SHOWED_CELL) {
-                print_cell(contentGrid[i][j]);
-            } else {
-                printf("%s", backgroundColors[2]);
-                printf("  ");
-                printf("%s", foregroundColors[0]);
+            int isCursor = (i == cursorY && j == cursorX);
+            if (displayGrid[i][j] == FLAG)
+            {
+                print_cell(-2, isCursor);
             }
+            else if (displayGrid[i][j] == SHOWED_CELL)
+            {
+                print_cell(contentGrid[i][j], isCursor);
+            }
+            else
+            {
+                char *c;
+                if (isCursor)
+                    c = backgroundColors[3];
+                else
+                    c = backgroundColors[2];
+                printf("%s  %s", c, foregroundColors[0]);
+            }
+        }
+    }
+    return 0;
+}
+
+int waitForInput(int **contentGrid, int **displayGrid, int width, int height, int *coordX, int *coordY, int *action)
+{
+    int x, y = 0;
+    char flag = 1;
+    while (flag)
+    {
+        // Clear screen
+        printf("\e[1;1H\e[2J");
+        // Show grid
+        showGameGrid(contentGrid, displayGrid, width, height, x, y);
+        // Get input
+        char input;
+        input = _getch();
+        input = tolower(input);
+
+        if (input == 'd')
+        {
+            x++;
+        }
+        else if (input == 'q')
+        {
+            x--;
+        }
+        else if (input == 'z')
+        {
+            y--;
+        }
+        else if (input == 's')
+        {
+            y++;
+        }
+        else if (input == 3)
+        {
+            // If ctrl+c exit
+            // Exit directly, process is stopped instantly
+            // TODO : free memory ?
+            exit(1);
         }
     }
     return 0;
@@ -166,14 +248,16 @@ int main()
         }
     }
     // add random bombs and flags
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         // Compute random coords
         int x = rand() % width;
         int y = rand() % height;
         // Add bomb
         contentGrid[y][x] = BOMB;
     }
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         // Compute random coords
         int x = rand() % width;
         int y = rand() % height;
@@ -182,7 +266,8 @@ int main()
     }
 
     // Show random numbers
-    for(int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++)
+    {
         // Compute random coords
         int x = rand() % width;
         int y = rand() % height;
@@ -190,8 +275,8 @@ int main()
         displayGrid[y][x] = SHOWED_CELL;
     }
 
-
-    showGameGrid(contentGrid, displayGrid, width, height);
+    int x, y, action;
+    waitForInput(contentGrid, displayGrid, width, height, &x, &y, &action);
 
     // Free grids
     for (int i = 0; i < height; i++)

@@ -1,8 +1,7 @@
-#define WINDOWS         // To remove if we are not on windows
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
 #define TEST            // To remove if we are not testing
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <windows.h>
 #include <conio.h>
 #else
@@ -61,7 +60,7 @@ char *backgroundColors[] = {
 
 };
 
-#ifdef WINDOWS
+#ifdef _WIN32
 int initializeWindowsConsole()
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -107,10 +106,10 @@ int _getch(void)
 
 int initializeDisplay()
 {
-#ifdef WINDOWS
+#ifdef _WIN32
     if (initializeWindowsConsole() < 0)
     {
-        fprintf(stderr, "Error: Unable to initialize Windows console\n");
+        fprintf(stderr, "Error: Unable to initialize windows console\n");
         return -1;
     }
 #endif

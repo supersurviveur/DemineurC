@@ -1,6 +1,6 @@
 #define WINDOWS         // To remove if we are not on windows
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
-// #define TEST            // To remove if we are not testing
+#define TEST            // To remove if we are not testing
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -16,14 +16,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-#define showElement(x) printf(x)
+// #define showElement(x) printf(x)
 #ifdef UNICODE_DISPLAY
-#define SHOW_FLAG() showElement("\u2691 ") // ⚑
-#define SHOW_BOMB() showElement("\u2b24 ") // ⬤
+#define SHOW_FLAG() "\u2691 " // ⚑
+#define SHOW_BOMB() "\u2b24 " // ⬤
 #else
-#define SHOW_FLAG() showElement("D ")
-#define SHOW_BOMB() showElement("B ")
+#define SHOW_FLAG() "D "
+#define SHOW_BOMB() "B "
 #endif
 
 char *foregroundColors[] = {
@@ -116,61 +117,62 @@ int initializeDisplay()
     return 0;
 }
 
-void print_cell(int type, int isCursor)
+char *print_cell(int type, int isCursor)
 {
+    char *result = (char *)malloc(100 * sizeof(char));
+    int position;
     if (isCursor)
     {
-        printf("%s", backgroundColors[3]);
+        position = sprintf(result, "%s", backgroundColors[3]);
     }
     else
     {
-        printf("%s", backgroundColors[1]);
+        position = sprintf(result, "%s", backgroundColors[1]);
     }
 
     if (type == -2)
     {
-        printf("%s", foregroundColors[1]);
-        SHOW_FLAG();
-        printf("%s", foregroundColors[0]);
+        sprintf(result+position, "%s%s%s", foregroundColors[1], SHOW_FLAG(), foregroundColors[0]);
     }
     else if (type == BOMB)
     {
-        printf("%s", foregroundColors[2]);
-        SHOW_BOMB();
-        printf("%s", foregroundColors[0]);
+        sprintf(result+position, "%s%s%s", foregroundColors[2], SHOW_BOMB(), foregroundColors[0]);
     }
     else if (type == 0)
     {
-        printf("  ");
-        printf("%s", foregroundColors[0]);
+        sprintf(result+position, "  %s", foregroundColors[0]);
     }
     else
     {
-        printf("%s", foregroundColors[type + 2]);
-        printf("%d ", type);
-        printf("%s", foregroundColors[0]);
+        sprintf(result+position, "%s%d %s", foregroundColors[type + 2], type, foregroundColors[0]);
     }
+    return result;
 }
 
 int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
-    // char **content = (char **)malloc(height * sizeof(char *));
+    char **content = (char **)malloc(height * sizeof(char *));
     for (int i = 0; i < height; i++)
     {
+        content[i] = (char *)malloc(width * 100 * sizeof(char));
+        int position = 0;
         if (i != 0)
         {
-            printf("\n");
+            position = sprintf(content[i], "\n");
+            // printf("\n");
         }
         for (int j = 0; j < width; j++)
         {
             int isCursor = (i == cursorY && j == cursorX);
             if (displayGrid[i*width+j] == FLAG)
             {
-                print_cell(-2, isCursor);
+                position += sprintf(content[i]+position, "%s", print_cell(-2, isCursor));
+                // printf("%s", print_cell(-2, isCursor));
             }
             else if (displayGrid[i*width+j] == SHOWED_CELL)
             {
-                print_cell(contentGrid[i*width+j], isCursor);
+                position += sprintf(content[i]+position, "%s", print_cell(contentGrid[i*width+j], isCursor));
+                // printf("%s", print_cell(contentGrid[i*width+j], isCursor));
             }
             else
             {
@@ -179,10 +181,20 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
                     c = backgroundColors[3];
                 else
                     c = backgroundColors[2];
-                printf("%s  %s", c, foregroundColors[0]);
+                position += sprintf(content[i]+position, "%s  %s", c, foregroundColors[0]);
+                // printf("%s  %s", c, foregroundColors[0]);
             }
         }
     }
+    // Flatten content
+    char *result = (char *)malloc(height * width * 100 * sizeof(char));
+    int position = 0;
+    for (int i = 0; i < height; i++)
+    {
+        position += sprintf(result+position, "%s", content[i]);
+    }
+    // Finally, show the entire grid in one call
+    printf("\e[?25l\e[1;1H\e[2J%s\n", result); // Clear screen, hide cursor and show content
     return 0;
 }
 
@@ -190,11 +202,9 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
 {
     int x = 0;
     int y = 0;
-    char flag = 1;
+    bool flag = 1;
     while (flag)
     {
-        // Clear screen
-        printf("\e[1;1H\e[2J");
         // Show grid
         showGameGrid(contentGrid, displayGrid, width, height, x, y);
         // Get input

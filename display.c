@@ -1,6 +1,8 @@
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
 #define TEST            // To remove if we are not testing
 
+// TODO free malloc calls
+
 #ifdef _WIN32
 #include <windows.h>
 #include <conio.h>
@@ -190,7 +192,7 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
     }
     position += sprintf(result + position, "\n"); // Show cursor
     // Finally, show the entire grid in one call
-    puts(result);
+    fwrite(result, position, 1, stdout);
     return 0;
 }
 
@@ -238,6 +240,16 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             // Exit directly, process is stopped instantly
             // TODO : free memory ?
             exit(1);
+        } else if (input == 'f') {
+            *coordX = x;
+            *coordY = y;
+            *action = FLAG;
+            flag = 0;
+        } else if (input == 'e') {
+            *coordX = x;
+            *coordY = y;
+            *action = SHOW_CELL;
+            flag = 0;
         }
     }
     return 0;

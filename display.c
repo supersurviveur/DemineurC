@@ -187,13 +187,14 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
     }
     // Flatten content
     char *result = (char *)malloc(height * width * 100 * sizeof(char));
-    int position = 0;
+    int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J");// Clear screen, hide cursor
     for (int i = 0; i < height; i++)
     {
         position += sprintf(result+position, "%s", content[i]);
     }
+    position += sprintf(result+position, "\n");// Show cursor
     // Finally, show the entire grid in one call
-    printf("\e[?25l\e[1;1H\e[2J%s\n", result); // Clear screen, hide cursor and show content
+    puts(result);
     return 0;
 }
 

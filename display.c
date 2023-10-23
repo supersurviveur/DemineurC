@@ -1,5 +1,6 @@
 #define WINDOWS         // To remove if we are not on windows
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
+// #define TEST            // To remove if we are not testing
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -10,6 +11,7 @@
 #endif
 
 #include "constants.h"
+#include "display.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -150,7 +152,7 @@ void print_cell(int type, int isCursor)
     }
 }
 
-int showGameGrid(int **contentGrid, int **displayGrid, int width, int height, int cursorX, int cursorY)
+int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
     // char **content = (char **)malloc(height * sizeof(char *));
     for (int i = 0; i < height; i++)
@@ -162,13 +164,13 @@ int showGameGrid(int **contentGrid, int **displayGrid, int width, int height, in
         for (int j = 0; j < width; j++)
         {
             int isCursor = (i == cursorY && j == cursorX);
-            if (displayGrid[i][j] == FLAG)
+            if (displayGrid[i*width+j] == FLAG)
             {
                 print_cell(-2, isCursor);
             }
-            else if (displayGrid[i][j] == SHOWED_CELL)
+            else if (displayGrid[i*width+j] == SHOWED_CELL)
             {
-                print_cell(contentGrid[i][j], isCursor);
+                print_cell(contentGrid[i*width+j], isCursor);
             }
             else
             {
@@ -184,7 +186,7 @@ int showGameGrid(int **contentGrid, int **displayGrid, int width, int height, in
     return 0;
 }
 
-int waitForInput(int **contentGrid, int **displayGrid, int width, int height, int *coordX, int *coordY, int *action)
+int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, int *action)
 {
     int x = 0;
     int y = 0;
@@ -227,6 +229,7 @@ int waitForInput(int **contentGrid, int **displayGrid, int width, int height, in
     return 0;
 }
 
+#ifdef TEST
 int main()
 {
     initializeDisplay();
@@ -236,23 +239,21 @@ int main()
     // Create grids
     int width = 10;
     int height = 10;
-    int **contentGrid = (int **)malloc(height * sizeof(int *));
+    int *contentGrid = (int *)malloc(width * height * sizeof(int *));
     for (int i = 0; i < height; i++)
     {
-        contentGrid[i] = (int *)malloc(width * sizeof(int));
         for (int j = 0; j < width; j++)
         {
             // random content
-            contentGrid[i][j] = rand() % 9;
+            contentGrid[i*width + j] = rand() % 9;
         }
     }
-    int **displayGrid = (int **)malloc(height * sizeof(int *));
+    int *displayGrid = (int *)malloc(width * height * sizeof(int *));
     for (int i = 0; i < height; i++)
     {
-        displayGrid[i] = (int *)malloc(width * sizeof(int));
         for (int j = 0; j < width; j++)
         {
-            displayGrid[i][j] = HIDDEN_CELL;
+            displayGrid[i*width+j] = HIDDEN_CELL;
         }
     }
     // add random bombs and flags
@@ -262,7 +263,7 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add bomb
-        contentGrid[y][x] = BOMB;
+        contentGrid[y*width+x] = BOMB;
     }
     for (int i = 0; i < 10; i++)
     {
@@ -270,7 +271,7 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add flag
-        displayGrid[y][x] = FLAG;
+        displayGrid[y*width+x] = FLAG;
     }
 
     // Show random numbers
@@ -280,19 +281,15 @@ int main()
         int x = rand() % width;
         int y = rand() % height;
         // Add flag
-        displayGrid[y][x] = SHOWED_CELL;
+        displayGrid[y*width+x] = SHOWED_CELL;
     }
 
     int x, y, action;
     waitForInput(contentGrid, displayGrid, width, height, &x, &y, &action);
 
     // Free grids
-    for (int i = 0; i < height; i++)
-    {
-        free(contentGrid[i]);
-        free(displayGrid[i]);
-    }
     free(contentGrid);
     free(displayGrid);
     return 0;
 }
+#endif

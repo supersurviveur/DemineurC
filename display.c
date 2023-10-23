@@ -6,11 +6,14 @@
 #include <conio.h>
 #else
 #include <termios.h>
+#include <unistd.h>
 #endif
 
 #include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
 
 #define showElement(x) printf(x)
 #ifdef UNICODE_DISPLAY
@@ -114,9 +117,13 @@ int initializeDisplay()
 void print_cell(int type, int isCursor)
 {
     if (isCursor)
+    {
         printf("%s", backgroundColors[3]);
+    }
     else
+    {
         printf("%s", backgroundColors[1]);
+    }
 
     if (type == -2)
     {
@@ -179,7 +186,8 @@ int showGameGrid(int **contentGrid, int **displayGrid, int width, int height, in
 
 int waitForInput(int **contentGrid, int **displayGrid, int width, int height, int *coordX, int *coordY, int *action)
 {
-    int x, y = 0;
+    int x = 0;
+    int y = 0;
     char flag = 1;
     while (flag)
     {

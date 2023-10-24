@@ -196,19 +196,62 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
     return 0;
 }
 
+int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
+{
+    // Write on console only where changes occured
+    char *content = (char *)malloc(100 * sizeof(char));
+    int position = 0;
+    // Edit old cursor
+    if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)
+    {
+        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, print_cell(-2, 0));
+    }
+    else if (displayGrid[oldCursorY * width + oldCursorX] == SHOWED_CELL)
+    {
+        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, print_cell(contentGrid[oldCursorY * width + oldCursorX], 0));
+    }
+    else
+    {
+        position += sprintf(content, "\e[%d;%dH%s  %s", oldCursorY + 1, oldCursorX * 2 + 1, backgroundColors[2], foregroundColors[0]);
+    }
+    // // Edit new cursor
+    if (displayGrid[cursorY * width + cursorX] == FLAG)
+    {
+        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, print_cell(-2, 1));
+    }
+    else if (displayGrid[cursorY * width + cursorX] == SHOWED_CELL)
+    {
+        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, print_cell(contentGrid[cursorY * width + cursorX], 1));
+    }
+    else
+    {
+        position += sprintf(content + position, "\e[%d;%dH%s  %s", cursorY + 1, cursorX * 2 + 1, backgroundColors[3], foregroundColors[0]);
+    }
+    // Show changes
+    fwrite(content, position, 1, stdout);
+    return 0;
+}
+
 int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, int *action)
 {
     int x = 0;
     int y = 0;
+    int oldX = 0;
+    int oldY = 0;
     bool flag = 1;
+    // Show grid
+    showGameGrid(contentGrid, displayGrid, width, height, x, y);
     while (flag)
     {
-        // Show grid
-        showGameGrid(contentGrid, displayGrid, width, height, x, y);
+        // Update grid
+        updateGameGrid(contentGrid, displayGrid, width, height, x, y, oldX, oldY);
         // Get input
         char input;
         input = _getch();
         input = tolower(input);
+
+        oldX = x;
+        oldY = y;
 
         if (input == 'd')
         {
@@ -240,12 +283,16 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             // Exit directly, process is stopped instantly
             // TODO : free memory ?
             exit(1);
-        } else if (input == 'f') {
+        }
+        else if (input == 'f')
+        {
             *coordX = x;
             *coordY = y;
             *action = FLAG;
             flag = 0;
-        } else if (input == 'e') {
+        }
+        else if (input == 'e')
+        {
             *coordX = x;
             *coordY = y;
             *action = SHOW_CELL;
@@ -316,6 +363,9 @@ int main()
     // Free grids
     free(contentGrid);
     free(displayGrid);
+
+    // Clear screen
+    printf("\e[?25h\e[1;1H\e[2J");
     return 0;
 }
 #endif

@@ -1,7 +1,6 @@
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
 #define TEST            // To remove if we are not testing
 
-// TODO free malloc calls
 // TODO add comments
 // TODO better error handling
 
@@ -212,12 +211,16 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
             if (displayGrid[i * width + j] == FLAG)
             {
                 // Add a flag
-                position += sprintf(content[i] + position, "%s", print_cell(-2, isCursor));
+                char *cell = print_cell(-2, isCursor);
+                position += sprintf(content[i] + position, "%s", cell);
+                free(cell);
             }
             else if (displayGrid[i * width + j] == SHOWED_CELL)
             {
                 // Add the content of the cell
-                position += sprintf(content[i] + position, "%s", print_cell(contentGrid[i * width + j], isCursor));
+                char *cell = print_cell(contentGrid[i * width + j], isCursor);
+                position += sprintf(content[i] + position, "%s", cell);
+                free(cell);
             }
             else
             {
@@ -240,6 +243,14 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
     position += sprintf(result + position, "\n");
     // Finally, show the entire grid in one call
     fwrite(result, position, 1, stdout);
+
+    // Free memory
+    for (int i = 0; i < height; i++)
+    {
+        free(content[i]);
+    }
+    free(content);
+    free(result);
     return 0;
 }
 
@@ -263,11 +274,15 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
     // Edit old cursor
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)
     {
-        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, print_cell(-2, 0));
+        char *cell = print_cell(-2, 0);
+        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
+        free(cell);
     }
     else if (displayGrid[oldCursorY * width + oldCursorX] == SHOWED_CELL)
     {
-        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, print_cell(contentGrid[oldCursorY * width + oldCursorX], 0));
+        char *cell = print_cell(contentGrid[oldCursorY * width + oldCursorX], 0);
+        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
+        free(cell);
     }
     else
     {
@@ -276,11 +291,15 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
     // // Edit new cursor
     if (displayGrid[cursorY * width + cursorX] == FLAG)
     {
-        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, print_cell(-2, 1));
+        char *cell = print_cell(-2, 1);
+        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
+        free(cell);
     }
     else if (displayGrid[cursorY * width + cursorX] == SHOWED_CELL)
     {
-        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, print_cell(contentGrid[cursorY * width + cursorX], 1));
+        char *cell = print_cell(contentGrid[cursorY * width + cursorX], 1);
+        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
+        free(cell);
     }
     else
     {
@@ -288,6 +307,8 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
     }
     // Show changes
     fwrite(content, position, 1, stdout);
+    // Free memory
+    free(content);
     return 0;
 }
 
@@ -426,6 +447,9 @@ int main()
     }
 
     int x, y, action;
+    while (1) {
+        showGameGrid(contentGrid, displayGrid, width, height, x, y);
+    }
     waitForInput(contentGrid, displayGrid, width, height, &x, &y, &action);
 
     // Free grids

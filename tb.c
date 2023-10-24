@@ -4,9 +4,13 @@
 #include <time.h>
 
 int const BOMB = 9; //symbole bombe a 9 pour avoir un tableau afficher rectangulaire
-int nombredelignes = 16; 
-int nombredecolonnes  = 32;
-int nombredebombe = 128;
+int nombredelignes = 8; 
+int nombredecolonnes  = 12;
+int nombredebombe =24;
+
+int ocho=8;
+int diew=10;
+
 
 int tablecoordonnees[2]; //ne pas toucher
 int tablevoisins[9]; //ne pas toucher
@@ -130,6 +134,16 @@ int * creetableauaveclesbombes(int nombredecolonnes,int nombredelignes,int nombr
     return tableau;
 }
 
+void difficulty(int n,int*p1,int*p2,int*p3){
+    if(n==0){*p1=8;*p2=12;*p3=10;}
+    if(n==1){*p1=12;*p2=20;*p3=30;}
+    if(n==2){*p1=16;*p2=26;*p3=70;}
+    if(n==3){*p1=20;*p2=32;*p3=120;}
+    if(n==4){*p1=24;*p2=40;*p3=200;}
+    if(n==5){*p1=28;*p2=45;*p3=300;}
+    if(n==6){*p1=32;*p2=50;*p3=420;}
+    if(n==7){*p1=50;*p2=80;*p3=1000;}
+}
 
 
 int main()
@@ -137,11 +151,15 @@ int main()
     printf("");
     srand(time(NULL)); //initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
 
+
+    difficulty(0,&nombredelignes,&nombredecolonnes,&nombredebombe);
+    
+
     int * ttvide = creetableauaveclesbombes(nombredelignes,nombredecolonnes,0);
     //ttvide est le tableau d'affichage
 
     int * ttbombe = creetableauaveclesbombes(nombredelignes,nombredecolonnes,nombredebombe);
-    //ttbombe est le tableau avec les bombes et les choffres
+    //ttbombe est le tableau avec les bombes et les chiffres
 
 
     printTable(ttvide,nombredelignes,nombredecolonnes);

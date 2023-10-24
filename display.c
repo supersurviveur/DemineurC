@@ -3,6 +3,9 @@
 
 // TODO free malloc calls
 
+// Includes different libraries depending on the OS
+// These libs are used for getting input without pressing enter, and for ascii colors on windows
+// _WIN32 is defined by the compiler
 #ifdef _WIN32
 #include <windows.h>
 #include <conio.h>
@@ -19,7 +22,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-// #define showElement(x) printf(x)
+// Define characters to display for each type of cell, in unicode or letters, depending on UNICODE_DISPLAY flag
 #ifdef UNICODE_DISPLAY
 #define SHOW_FLAG() "\u2691 " // ⚑
 #define SHOW_BOMB() "\u2b24 " // ⬤
@@ -28,10 +31,10 @@
 #define SHOW_BOMB() "B "
 #endif
 
+// Colors for texts
 char *foregroundColors[] = {
     "\e[0m", // RESET
 
-    // FOREGROUND
     "\e[1;31m",            // FLAG
     "\e[1m\e[38;2;0;0;0m", // BOMB
     // NUMBERS
@@ -53,32 +56,42 @@ char *foregroundColors[] = {
     "\e[1m\e[38;2;129;129;129m",
 
 };
+// Colors for backgrounds
 char *backgroundColors[] = {
     "\e[0m", // RESET
-    // BACKGROUND
+
     "\e[48;2;240;240;240m", // SHOWED_CELL
     "\e[48;2;180;180;180m", // HIDDEN_CELL
     "\e[48;2;100;100;100m", // CURRENT_CELL
 
 };
 
+// On windows, we need to initialize the console to be able to use unicode characters and ascii colors
 #ifdef _WIN32
+/**
+ * @brief Initialize windows console to be able to use unicode characters and ascii colors
+ * @return 0 if success, -1 if error
+*/
 int initializeWindowsConsole()
 {
+    // Get current console
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hConsole == INVALID_HANDLE_VALUE)
     {
         return -1;
     }
+    // Get current console mode
     DWORD mode;
     if (!GetConsoleMode(hConsole, &mode))
     {
         return -1;
     }
+    // Enable ascii colors mode
     if (!SetConsoleMode(hConsole, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING))
     {
         return -1;
     }
+    // Enable unicode characters
     if (!SetConsoleOutputCP(CP_UTF8))
     {
         return -1;
@@ -86,28 +99,38 @@ int initializeWindowsConsole()
     return 0;
 }
 #else
-int _getch(void)
+// On linux, we need to use a custom function to get input without pressing enter
+/**
+ * @brief Get input without pressing enter
+ * @return input char
+*/
+int _getch()
 {
     int ch;
     struct termios oldt;
     struct termios newt;
 
-    tcgetattr(STDIN_FILENO, &oldt);   /*store old settings */
-    newt = oldt;                      /* copy old settings to new settings */
-    newt.c_lflag &= ~(ICANON | ECHO); /* make one change to old settings in new settings */
+    tcgetattr(STDIN_FILENO, &oldt);   // Get current settings of stdin
+    newt = oldt;                      // Copy them
+    newt.c_lflag &= ~(ICANON | ECHO); // Add flags to get input without pressing enter
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt); /*apply the new settings immediatly */
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt); // Apply new settings
 
-    ch = getchar(); /* standard getchar call */
+    ch = getchar(); // Get input
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); /*reapply the old settings */
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // Restore old settings
 
-    return ch; /*return received char */
+    return ch;
 }
 #endif
 
+/**
+ * @brief Initialize display
+ * @return 0 if success, -1 if error
+*/
 int initializeDisplay()
 {
+    // On windows, we try to initialize the console
 #ifdef _WIN32
     if (initializeWindowsConsole() < 0)
     {
@@ -306,8 +329,6 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
 int main()
 {
     initializeDisplay();
-    // print_cell(1);
-    // printf("\e[1;31m \u2691 💣 ⬤ • ◮ ☐");
 
     // Create grids
     int width = 10;

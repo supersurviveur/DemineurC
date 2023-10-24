@@ -2,6 +2,8 @@
 #define TEST            // To remove if we are not testing
 
 // TODO free malloc calls
+// TODO add comments
+// TODO better error handling
 
 // Includes different libraries depending on the OS
 // These libs are used for getting input without pressing enter, and for ascii colors on windows
@@ -71,7 +73,7 @@ char *backgroundColors[] = {
 /**
  * @brief Initialize windows console to be able to use unicode characters and ascii colors
  * @return 0 if success, -1 if error
-*/
+ */
 int initializeWindowsConsole()
 {
     // Get current console
@@ -103,7 +105,7 @@ int initializeWindowsConsole()
 /**
  * @brief Get input without pressing enter
  * @return input char
-*/
+ */
 int _getch()
 {
     int ch;
@@ -127,7 +129,7 @@ int _getch()
 /**
  * @brief Initialize display
  * @return 0 if success, -1 if error
-*/
+ */
 int initializeDisplay()
 {
     // On windows, we try to initialize the console
@@ -141,84 +143,118 @@ int initializeDisplay()
     return 0;
 }
 
+/**
+ * @brief Print a single cell
+ * @param type Type of cell
+ * @param isCursor 1 if cell is the cursor, 0 otherwise
+ * @return String to print
+ */
 char *print_cell(int type, int isCursor)
 {
+    // Allocate memory for result
     char *result = (char *)malloc(100 * sizeof(char));
-    int position;
-    if (isCursor)
-    {
-        position = sprintf(result, "%s", backgroundColors[3]);
-    }
-    else
-    {
-        position = sprintf(result, "%s", backgroundColors[1]);
-    }
-
+    // Choose background color depending on isCursor value
+    int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
     if (type == -2)
     {
-        sprintf(result + position, "%s%s%s", foregroundColors[1], SHOW_FLAG(), foregroundColors[0]);
+        // Show a flag
+        position += sprintf(result + position, "%s%s", foregroundColors[1], SHOW_FLAG());
     }
     else if (type == BOMB)
     {
-        sprintf(result + position, "%s%s%s", foregroundColors[2], SHOW_BOMB(), foregroundColors[0]);
+        // Show a bomb
+        position += sprintf(result + position, "%s%s", foregroundColors[2], SHOW_BOMB());
     }
     else if (type == 0)
     {
-        sprintf(result + position, "  %s", foregroundColors[0]);
+        // Show an empty cell
+        position += sprintf(result + position, "  ");
     }
     else
     {
-        sprintf(result + position, "%s%d %s", foregroundColors[type + 2], type, foregroundColors[0]);
+        // Show the number of bombs around
+        position += sprintf(result + position, "%s%d ", foregroundColors[type + 2], type);
     }
+    // Reset colors
+    sprintf(result + position, "%s", foregroundColors[0]);
     return result;
 }
 
+/**
+ * @brief Show the entire grid
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ * @param cursorX X position of the cursor
+ * @param cursorY Y position of the cursor
+ * @return 0 if success, -1 if error
+ */
 int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
+    // Create a 2D array of strings
     char **content = (char **)malloc(height * sizeof(char *));
     for (int i = 0; i < height; i++)
     {
+        // Allocate memory for each line
         content[i] = (char *)malloc(width * 100 * sizeof(char));
         int position = 0;
         if (i != 0)
         {
+            // If we are not on the first line, add a newline
             position = sprintf(content[i], "\n");
         }
         for (int j = 0; j < width; j++)
         {
+            // Check if current cell is the cursor
             int isCursor = (i == cursorY && j == cursorX);
+
             if (displayGrid[i * width + j] == FLAG)
             {
+                // Add a flag
                 position += sprintf(content[i] + position, "%s", print_cell(-2, isCursor));
             }
             else if (displayGrid[i * width + j] == SHOWED_CELL)
             {
+                // Add the content of the cell
                 position += sprintf(content[i] + position, "%s", print_cell(contentGrid[i * width + j], isCursor));
             }
             else
             {
-                char *c;
-                if (isCursor)
-                    c = backgroundColors[3];
-                else
-                    c = backgroundColors[2];
+                // Add an empty hidden cell
+                // Choose background color depending on isCursor value
+                char *c = backgroundColors[isCursor ? 3 : 2];
+                // Add an empty cell
                 position += sprintf(content[i] + position, "%s  %s", c, foregroundColors[0]);
             }
         }
     }
-    // Flatten content
+    // Flatten content, to be able to show the entire grid in one call
     char *result = (char *)malloc(height * width * 100 * sizeof(char));
     int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J"); // Clear screen, hide cursor
     for (int i = 0; i < height; i++)
     {
+        // Add each line
         position += sprintf(result + position, "%s", content[i]);
     }
-    position += sprintf(result + position, "\n"); // Show cursor
+    position += sprintf(result + position, "\n");
     // Finally, show the entire grid in one call
     fwrite(result, position, 1, stdout);
     return 0;
 }
 
+/**
+ * @brief Update the grid, only where changes occured
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ * @param cursorX X position of the cursor
+ * @param cursorY Y position of the cursor
+ * @param oldCursorX X position of the cursor before the update
+ * @param oldCursorY Y position of the cursor before the update
+ * @return 0 if success, -1 if error
+ */
 int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
     // Write on console only where changes occured
@@ -255,8 +291,20 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
     return 0;
 }
 
+/**
+ * @brief Wait for user input
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ * @param coodX Pointer to the X position of the cursor
+ * @param coordY Pointer to the Y position of the cursor
+ * @param action Pointer to the action realized by the user
+ * @return 0 if success, -1 if error
+ */
 int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, int *action)
 {
+    // Initialize cursor position
     int x = 0;
     int y = 0;
     int oldX = 0;
@@ -273,9 +321,11 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         input = _getch();
         input = tolower(input);
 
+        // Save old cursor position
         oldX = x;
         oldY = y;
 
+        // Process input
         if (input == 'd')
         {
             x++;
@@ -307,24 +357,21 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             // TODO : free memory ?
             exit(1);
         }
-        else if (input == 'f')
+        else if (input == 'f' || input == 'e')
         {
+            // Pass cursor position in pointers
             *coordX = x;
             *coordY = y;
-            *action = FLAG;
-            flag = 0;
-        }
-        else if (input == 'e')
-        {
-            *coordX = x;
-            *coordY = y;
-            *action = SHOW_CELL;
+            // Pass action in pointer, depending on input
+            *action = input == 'f' ? FLAG : SHOW_CELL;
+            // Exit loop
             flag = 0;
         }
     }
     return 0;
 }
 
+// If TEST is defined, we create a random grid and show it
 #ifdef TEST
 int main()
 {

@@ -6,20 +6,26 @@
 
 // Functions to manage a 2D table
 
-int *generateTable(int rows, int columns) {
-    int *table = (int *) malloc(rows * columns * sizeof(int));
-    if (table == NULL) {
+int *generateTable(int rows, int columns)
+{
+    int *table = (int *)malloc(rows * columns * sizeof(int));
+    if (table == NULL)
+    {
         return NULL;
     }
-    for (int i = 0; i < rows * columns; i++) {
+    for (int i = 0; i < rows * columns; i++)
+    {
         table[i] = 0;
     }
     return table;
 }
 
-void printTable(int *table, int rows, int columns) {
-    for (int i = 0; i < rows * columns; i++) {
-        if (i % columns == 0) {
+void printTable(int *table, int rows, int columns)
+{
+    for (int i = 0; i < rows * columns; i++)
+    {
+        if (i % columns == 0)
+        {
             printf("\n");
         }
         printf("%d ", table[i]);
@@ -27,29 +33,35 @@ void printTable(int *table, int rows, int columns) {
     printf("\n");
 }
 
-void freeTable(int *table) {
-    free(table);
-}
+// void freeTable(int *table) {
+//     free(table);
+// }
 
-void editTable(int *table, int rows, int columns, int row, int column, int value) {
+void editTable(int *table, int rows, int columns, int row, int column, int value)
+{
     table[row * columns + column] = value;
 }
 
-int getTableValue(int *table, int rows, int columns, int row, int column) {
+int getTableValue(int *table, int rows, int columns, int row, int column)
+{
     return table[row * columns + column];
 }
 
-int countTable(const int *table, int rows, int columns, int value) {
+int countTable(const int *table, int rows, int columns, int value)
+{
     int count = 0;
-    for (int i = 0; i < rows * columns; i++) {
-        if (table[i] == value) {
+    for (int i = 0; i < rows * columns; i++)
+    {
+        if (table[i] == value)
+        {
             count++;
         }
     }
     return count;
 }
 
-int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int column) {
+int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int column)
+{
     int *values = generateTable(8, 1);
     values[0] = getTableValue(table, rows, columns, row - 1, column - 1);
     values[1] = getTableValue(table, rows, columns, row - 1, column);
@@ -64,25 +76,37 @@ int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int colu
 
 // Fonction to play the bomb game
 
-void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y) {
+void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y)
+{
+    if (getTableValue(backTable, rows, columns, y, x) != 0) return ;
     // Get all the values around the cell
-    int *values = getAllTablesAroundCell(backTable, rows, columns, x, y);
+    int *values = getAllTablesAroundCell(backTable, rows, columns, y, x);
     // Show the next cells if the value is 0
     // TODO: Fonction à corriger car pas toutes les cases sont affichées
-    for (int i = 0; i < 8; ++i) {
-        editTable(frontTable, rows, columns, x + i / 3 - 1, y + i % 3 - 1, SHOWED_CELL);
-        if (values[i] == 0 && getTableValue(frontTable, rows, columns, x + i / 3 - 1, y + i % 3 - 1) == HIDDEN_CELL) {
-            showCell(backTable, frontTable, rows, columns, x + i / 3 - 1, y + i % 3 - 1);
+    int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    for (int i = 0; i < 8; ++i)
+    {
+        int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]);
+        if (values[i] != BOMB && temp_value == HIDDEN_CELL)
+            editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
+        if (values[i] == 0 && temp_value == HIDDEN_CELL)
+        {
+            showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
         }
     }
-    freeTable(values);
+    free(values);
 }
 
-void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameState) {
+void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameState)
+{
     *gameState = LOST;
-    for (int i = 0; i < rows * columns; i++) {
-        if (getTableValue(backTable, rows, columns, i / columns, i % columns) == BOMB) {
-            if (getTableValue(frontTable, rows, columns, i / columns, i % columns) != FLAG) {
+    for (int i = 0; i < rows * columns; i++)
+    {
+        if (getTableValue(backTable, rows, columns, i / columns, i % columns) == BOMB)
+        {
+            if (getTableValue(frontTable, rows, columns, i / columns, i % columns) != FLAG)
+            {
                 editTable(frontTable, rows, columns, i / columns, i % columns, SHOWED_CELL);
             }
         }
@@ -90,36 +114,49 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     printf("You lost !\n");
 }
 
-void winGame(int *backTable, int *frontTable, int rows, int columns, int *gameState) {
+void winGame(int *backTable, int *frontTable, int rows, int columns, int *gameState)
+{
     *gameState = WON;
     printf("You won !\n");
 }
 
-void
-userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x,
-          int y) {
-    if (input == PLACE_FLAG) {
-        int frontValue = getTableValue(frontTable, rows, columns, x, y);
-        if (frontValue == HIDDEN_CELL) {
-            editTable(frontTable, rows, columns, x, y, FLAG);
+void userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x,
+               int y)
+{
+    if (input == PLACE_FLAG)
+    {
+        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        if (frontValue == HIDDEN_CELL)
+        {
+            editTable(frontTable, rows, columns, y, x, FLAG);
             int nbFlags = countTable(frontTable, rows, columns, FLAG);
-            if (nbFlags == bombNumbers) {
+            if (nbFlags == bombNumbers)
+            {
                 winGame(backTable, frontTable, rows, columns, gameState);
             }
-        } else if (frontValue == FLAG) {
-            editTable(frontTable, rows, columns, x, y, HIDDEN_CELL);
         }
-    } else if (input == SHOW_CELL) {
-        int backValue = getTableValue(backTable, rows, columns, x, y);
-        int frontValue = getTableValue(frontTable, rows, columns, x, y);
-        if (frontValue == HIDDEN_CELL) {
-            if (backValue == BOMB) {
+        else if (frontValue == FLAG)
+        {
+            editTable(frontTable, rows, columns, y, x, HIDDEN_CELL);
+        }
+    }
+    else if (input == SHOW_CELL)
+    {
+        int backValue = getTableValue(backTable, rows, columns, y, x);
+        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        if (frontValue == HIDDEN_CELL)
+        {
+            if (backValue == BOMB)
+            {
                 loseGame(backTable, frontTable, rows, columns, gameState);
-            } else {
-                editTable(frontTable, rows, columns, x, y, SHOWED_CELL);
+            }
+            else
+            {
+                editTable(frontTable, rows, columns, y, x, SHOWED_CELL);
                 showCell(backTable, frontTable, rows, columns, x, y);
                 int nbShowedCells = countTable(frontTable, rows, columns, SHOWED_CELL);
-                if (nbShowedCells == rows * columns - bombNumbers) {
+                if (nbShowedCells == rows * columns - bombNumbers)
+                {
                     winGame(backTable, frontTable, rows, columns, gameState);
                 }
             }
@@ -128,7 +165,8 @@ userInput(char input, int *backTable, int *frontTable, int rows, int columns, in
 }
 
 #ifdef TEST
-int test() {
+int test()
+{
     // Tester le jeu avec génération du tableau, mise en place des bombes à des endroits précis, différentes entrées utilisateur, la fin du jeu
     // Définition des variables
     int rows = 6;
@@ -215,7 +253,8 @@ int test() {
 
     printf("Game state: %d\n", gameState);
 }
-int main() {
+int main()
+{
     return test();
 }
 #endif

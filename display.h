@@ -8,7 +8,7 @@
  * @param cursorY Y position of the cursor
  * @return 0 if success, -1 if error
  */
-int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY);
+int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height, int cursorX, int cursorY);
 
 /**
  * @brief Wait for user input

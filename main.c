@@ -15,7 +15,7 @@ int main()
     int cursorY = 0;
     char action = 0;
     int gameState = 0;
-    while (1) {
+    while (gameState == 0) {
         waitForInput(contentGrid, displayGrid, width, height, &cursorX, &cursorY, &action);
         userInput(action, contentGrid, displayGrid, width, height, nbBombs, &gameState, cursorX, cursorY);
 

@@ -23,8 +23,8 @@
 
 // Define characters to display for each type of cell, in unicode or letters, depending on UNICODE_DISPLAY flag
 #ifdef UNICODE_DISPLAY
-#define SHOW_FLAG() "\u2691 " // ⚑
-#define SHOW_BOMB() "\u2b24 " // ⬤
+#define SHOW_FLAG() "⚑ " // ⚑
+#define SHOW_BOMB() "⬤ " // ⬤
 #else
 #define SHOW_FLAG() "D "
 #define SHOW_BOMB() "B "
@@ -103,7 +103,7 @@ int initializeWindowsConsole()
  * @brief Get input without pressing enter
  * @return input char
  */
-int _getch()
+int getch()
 {
     int ch;
     struct termios oldt;
@@ -187,7 +187,7 @@ char *print_cell(int type, int isCursor)
  * @param cursorY Y position of the cursor
  * @return 0 if success, -1 if error
  */
-int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY)
+int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
     // Create a 2D array of strings
     char **content = (char **)malloc(height * sizeof(char *));
@@ -253,20 +253,19 @@ int showGameGrid(int *contentGrid, int *displayGrid, int width, int height, int 
 }
 
 /**
- * @brief Update the grid, only where changes occured
+ * @brief Update the grid, only where changes occurred
  * @param contentGrid Grid with the content of each cell
  * @param displayGrid Grid with the state of each cell
  * @param width Width of the grid
- * @param height Height of the grid
  * @param cursorX X position of the cursor
  * @param cursorY Y position of the cursor
  * @param oldCursorX X position of the cursor before the update
  * @param oldCursorY Y position of the cursor before the update
  * @return 0 if success, -1 if error
  */
-int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
+int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
-    // Write on console only where changes occured
+    // Write on console only where changes occurred
     char *content = (char *)malloc(100 * sizeof(char));
     int position = 0;
     // Edit old cursor
@@ -316,7 +315,7 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
  * @param displayGrid Grid with the state of each cell
  * @param width Width of the grid
  * @param height Height of the grid
- * @param coodX Pointer to the X position of the cursor
+ * @param coordX Pointer to the X position of the cursor
  * @param coordY Pointer to the Y position of the cursor
  * @param action Pointer to the action realized by the user
  * @return 0 if success, -1 if error
@@ -334,10 +333,10 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
     while (flag)
     {
         // Update grid
-        updateGameGrid(contentGrid, displayGrid, width, height, x, y, oldX, oldY);
+        updateGameGrid(contentGrid, displayGrid, width, x, y, oldX, oldY);
         // Get input
-        char input;
-        input = _getch();
+        int input;
+        input = getch();
         input = tolower(input);
 
         // Save old cursor position
@@ -382,7 +381,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             *coordX = x;
             *coordY = y;
             // Pass action in pointer, depending on input
-            *action = input == 'f' ? FLAG : SHOW_CELL;
+            *action = input == 'f' ? PLACE_FLAG : SHOW_CELL;
             // Exit loop
             flag = 0;
         }
@@ -444,7 +443,8 @@ int test()
         displayGrid[y * width + x] = SHOWED_CELL;
     }
 
-    int x, y, action;
+    int x, y;
+    char action;
     waitForInput(contentGrid, displayGrid, width, height, &x, &y, &action);
 
     // Free grids

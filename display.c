@@ -1,5 +1,4 @@
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
-#define TEST            // To remove if we are not testing
 
 // TODO add comments
 // TODO better error handling
@@ -20,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <stdio.h>
 #include <stdbool.h>
 
 // Define characters to display for each type of cell, in unicode or letters, depending on UNICODE_DISPLAY flag
@@ -323,7 +321,7 @@ int updateGameGrid(int *contentGrid, int *displayGrid, int width, int height, in
  * @param action Pointer to the action realized by the user
  * @return 0 if success, -1 if error
  */
-int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, int *action)
+int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, char *action)
 {
     // Initialize cursor position
     int x = 0;
@@ -394,7 +392,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
 
 // If TEST is defined, we create a random grid and show it
 #ifdef TEST
-int main()
+int test()
 {
     initializeDisplay();
 
@@ -447,9 +445,6 @@ int main()
     }
 
     int x, y, action;
-    while (1) {
-        showGameGrid(contentGrid, displayGrid, width, height, x, y);
-    }
     waitForInput(contentGrid, displayGrid, width, height, &x, &y, &action);
 
     // Free grids
@@ -459,5 +454,8 @@ int main()
     // Clear screen
     printf("\e[?25h\e[1;1H\e[2J");
     return 0;
+}
+int main() {
+    return test();
 }
 #endif

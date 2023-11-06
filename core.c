@@ -127,7 +127,8 @@ userInput(char input, int *backTable, int *frontTable, int rows, int columns, in
     }
 }
 
-int main() {
+#ifdef TEST
+int test() {
     // Tester le jeu avec génération du tableau, mise en place des bombes à des endroits précis, différentes entrées utilisateur, la fin du jeu
     // Définition des variables
     int rows = 6;
@@ -214,3 +215,7 @@ int main() {
 
     printf("Game state: %d\n", gameState);
 }
+int main() {
+    return test();
+}
+#endif

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.24)
 project(DemineurC C)
 
 set(CMAKE_C_STANDARD 11)
@@ -6,4 +6,4 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(DemineurC
-        clement.c)
+        main.c display.c core.c generation.c)

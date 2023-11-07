@@ -229,6 +229,12 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
             }
         }
     }
+    else if (input == ACTION_QUIT)
+    {
+        free(backTable);
+        free(frontTable);
+        exit(1);
+    }
 }
 
 #ifdef TEST

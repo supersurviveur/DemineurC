@@ -6,6 +6,7 @@
 
 extern char const ACTION_PLACE_FLAG;
 extern char const ACTION_DIG;
+extern char const ACTION_QUIT;
 extern int const FLAG;
 extern int const BOMB;
 extern int const HIDDEN_CELL;

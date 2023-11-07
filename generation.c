@@ -72,7 +72,7 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
             }
             else
             { // si la case ne existe pas
-                tableauvoisin[x + 3 * y] = coordonneesenint(nombredelignes, nombredecolonnes, colonnedeint, lignedeint);
+                tableauvoisin[x + 3 * y] = -1;
             }
         }
     }
@@ -85,8 +85,9 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     int nombredebombesencoreaplacer = nombredebombes % (nombredecolonnes * nombredelignes); // si le nombre de bombes est superieur a celui de la taille de la grille on se raporte a un nombre plus petit avec le modulo
     while (nombredebombesencoreaplacer > 0)
     {
-        int a = randomint(0, (nombredecolonnes * nombredelignes));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // a est une case du tableau
-        if (tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
+        int a = randomint(0, (nombredecolonnes * nombredelignes) - 1); // a est une case du tableau
+        if (
+            tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
         )
         {
             tableau[a] = BOMB;
@@ -97,7 +98,7 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
             for (int i = 0; i < 9; i++)
             {
                 int b = tablevoisins[i];
-                if (tableau[b] != BOMB)
+                if (b != -1 && tableau[b] != BOMB)
                 {
                     tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisine) de 1
                 }
@@ -131,8 +132,8 @@ int test()
     int *ttbombe = creetableauaveclesbombes(nombredelignes, nombredecolonnes, nombredebombe);
     // ttbombe est le tableau avec les bombes et les choffres
 
-    printTable(ttvide, nombredelignes, nombredecolonnes);
-    printTable(ttbombe, nombredelignes, nombredecolonnes);
+    // printTable(ttvide, nombredelignes, nombredecolonnes);
+    // printTable(ttbombe, nombredelignes, nombredecolonnes);
 
     return 0;
 }

@@ -184,15 +184,15 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     // Compute number of bombs
     if (difficulty == 1) // 10% of the grid
     {
-        *nbBombs = (*gridWidth * *gridHeight) / 10;
+        *nbBombs = (*gridWidth * *gridHeight) * 0.10;
     }
     else if (difficulty == 2) // 15% of the grid
     {
-        *nbBombs = (*gridWidth * *gridHeight) / 0.15;
+        *nbBombs = (*gridWidth * *gridHeight) * 0.15;
     }
     else if (difficulty == 3) // 20% of the grid
     {
-        *nbBombs = (*gridWidth * *gridHeight) / 5;
+        *nbBombs = (*gridWidth * *gridHeight) *0.20;
     }
 
     return 0;

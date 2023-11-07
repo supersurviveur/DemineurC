@@ -4,14 +4,12 @@
 #include <time.h>
 #include "constants.h"
 
-int nombredelignes = 16;
-int nombredecolonnes = 32;
-int nombredebombe = 128;
-
-int tablecoordonnees[2]; // ne pas toucher
-int tablevoisins[9];     // ne pas toucher
-
-// randomin renvoie un nombre entier aleatoire entre min(inclue) et max(exclue)
+/**
+ * @brief Génère un nombre entier aleatoire entre min (inclus) et max (exclus)
+ * @param min Valeur minimale
+ * @param max Valeur maximale
+ * @return Le nombre aleatoire généré
+ */
 int randomint(int min, int max)
 {
     int n = (rand() % (max + 1 - min)) + min;
@@ -92,6 +90,8 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
         )
         {
             tableau[a] = BOMB;
+            int tablecoordonnees[2];
+            int tablevoisins[9];
             intencoordonnees(nombredelignes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
             listedesentierdevoisins(tablevoisins, nombredelignes, nombredecolonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a
             for (int i = 0; i < 9; i++)
@@ -108,15 +108,20 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     return tableau;
 }
 
-int initializeGeneration(void)
+/**
+ * @brief Initialize raandom generation
+ */
+void initializeGeneration(void)
 {
     srand(time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
-    return 0;
 }
 
 #ifdef TEST
 int test()
 {
+    int nombredelignes = 16;
+    int nombredecolonnes = 32;
+    int nombredebombe = 128;
     printf("");
     initializeGeneration();
 

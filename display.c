@@ -141,43 +141,6 @@ int initializeDisplay(void)
 }
 
 /**
- * @brief Print a single cell
- * @param type Type of cell
- * @param isCursor 1 if cell is the cursor, 0 otherwise
- * @return String to print
- */
-char *print_cell(int type, int isCursor)
-{
-    // Allocate memory for result
-    char *result = (char *)malloc(100 * sizeof(char));
-    // Choose background color depending on isCursor value
-    int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
-    if (type == -2)
-    {
-        // Show a flag
-        position += sprintf(result + position, "%s%s", foregroundColors[1], SHOW_FLAG());
-    }
-    else if (type == BOMB)
-    {
-        // Show a bomb
-        position += sprintf(result + position, "%s%s", foregroundColors[2], SHOW_BOMB());
-    }
-    else if (type == 0)
-    {
-        // Show an empty cell
-        position += sprintf(result + position, "  ");
-    }
-    else
-    {
-        // Show the number of bombs around
-        position += sprintf(result + position, "%s%d ", foregroundColors[type + 2], type);
-    }
-    // Reset colors
-    sprintf(result + position, "%s", foregroundColors[0]);
-    return result;
-}
-
-/**
  * @brief Get the size of the grid
  * @param gridWidth Pointer to the width of the grid
  * @param gridHeight Pointer to the height of the grid
@@ -233,6 +196,43 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     }
 
     return 0;
+}
+
+/**
+ * @brief Print a single cell
+ * @param type Type of cell
+ * @param isCursor 1 if cell is the cursor, 0 otherwise
+ * @return String to print
+ */
+char *print_cell(int type, int isCursor)
+{
+    // Allocate memory for result
+    char *result = (char *)malloc(100 * sizeof(char));
+    // Choose background color depending on isCursor value
+    int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
+    if (type == -2)
+    {
+        // Show a flag
+        position += sprintf(result + position, "%s%s", foregroundColors[1], SHOW_FLAG());
+    }
+    else if (type == BOMB)
+    {
+        // Show a bomb
+        position += sprintf(result + position, "%s%s", foregroundColors[2], SHOW_BOMB());
+    }
+    else if (type == 0)
+    {
+        // Show an empty cell
+        position += sprintf(result + position, "  ");
+    }
+    else
+    {
+        // Show the number of bombs around
+        position += sprintf(result + position, "%s%d ", foregroundColors[type + 2], type);
+    }
+    // Reset colors
+    sprintf(result + position, "%s", foregroundColors[0]);
+    return result;
 }
 
 /**

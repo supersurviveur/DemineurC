@@ -33,10 +33,6 @@ void printTable(int *table, int rows, int columns)
     printf("\n");
 }
 
-// void freeTable(int *table) {
-//     free(table);
-// }
-
 void editTable(int *table, int rows, int columns, int row, int column, int value)
 {
     table[row * columns + column] = value;
@@ -118,11 +114,6 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     }
 }
 
-void winGame(int *backTable, int *frontTable, int rows, int columns, int *gameState)
-{
-    *gameState = WON;
-}
-
 void userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x,
                int y)
 {
@@ -154,7 +145,7 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
                 int nbShowedCells = countTable(frontTable, rows, columns, SHOWED_CELL);
                 if (nbShowedCells == rows * columns - bombNumbers)
                 {
-                    winGame(backTable, frontTable, rows, columns, gameState);
+                    *gameState = WON;
                 }
             }
         }

@@ -5,3 +5,4 @@
 */
 
 void userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x, int y);
+int *generateTable(int rows, int columns);

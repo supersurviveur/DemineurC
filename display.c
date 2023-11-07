@@ -192,7 +192,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     }
     else if (difficulty == 3) // 20% of the grid
     {
-        *nbBombs = (*gridWidth * *gridHeight) *0.20;
+        *nbBombs = (*gridWidth * *gridHeight) * 0.20;
     }
 
     return 0;

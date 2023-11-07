@@ -33,12 +33,12 @@ void printTable(int *table, int rows, int columns)
     printf("\n");
 }
 
-void editTable(int *table, int rows, int columns, int row, int column, int value)
+void editTable(int *table, int columns, int row, int column, int value)
 {
     table[row * columns + column] = value;
 }
 
-int getTableValue(int *table, int rows, int columns, int row, int column)
+int getTableValue(int *table, int columns, int row, int column)
 {
     return table[row * columns + column];
 }
@@ -56,17 +56,17 @@ int countTable(const int *table, int rows, int columns, int value)
     return count;
 }
 
-int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int column)
+int *getAllTablesAroundCell(int *table, int columns, int row, int column)
 {
     int *values = generateTable(8, 1);
-    values[0] = getTableValue(table, rows, columns, row - 1, column - 1);
-    values[1] = getTableValue(table, rows, columns, row - 1, column);
-    values[2] = getTableValue(table, rows, columns, row - 1, column + 1);
-    values[3] = getTableValue(table, rows, columns, row, column - 1);
-    values[4] = getTableValue(table, rows, columns, row, column + 1);
-    values[5] = getTableValue(table, rows, columns, row + 1, column - 1);
-    values[6] = getTableValue(table, rows, columns, row + 1, column);
-    values[7] = getTableValue(table, rows, columns, row + 1, column + 1);
+    values[0] = getTableValue(table, columns, row - 1, column - 1);
+    values[1] = getTableValue(table, columns, row - 1, column);
+    values[2] = getTableValue(table, columns, row - 1, column + 1);
+    values[3] = getTableValue(table, columns, row, column - 1);
+    values[4] = getTableValue(table, columns, row, column + 1);
+    values[5] = getTableValue(table, columns, row + 1, column - 1);
+    values[6] = getTableValue(table, columns, row + 1, column);
+    values[7] = getTableValue(table, columns, row + 1, column + 1);
     return values;
 }
 
@@ -74,11 +74,11 @@ int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int colu
 
 void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y)
 {
-    editTable(frontTable, rows, columns, y, x, SHOWED_CELL);
-    if (getTableValue(backTable, rows, columns, y, x) != 0)
+    editTable(frontTable, columns, y, x, SHOWED_CELL);
+    if (getTableValue(backTable, columns, y, x) != 0)
         return;
     // Get all the values around the cell
-    int *values = getAllTablesAroundCell(backTable, rows, columns, y, x);
+    int *values = getAllTablesAroundCell(backTable, columns, y, x);
     // Show the next cells if the value is 0
     // TODO: Fonction à corriger car pas toutes les cases sont affichées
     int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
@@ -87,9 +87,9 @@ void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int
     {
         if (!(x + Xpos[i] < 0 || x + Xpos[i] >= columns || y + Ypos[i] < 0 || y + Ypos[i] >= rows))
         {
-            int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]);
+            int temp_value = getTableValue(frontTable, columns, y + Ypos[i], x + Xpos[i]);
             if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG))
-                editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
+                editTable(frontTable, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
             if (values[i] == 0 && temp_value == HIDDEN_CELL)
             {
                 showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
@@ -104,11 +104,11 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     *gameState = LOST;
     for (int i = 0; i < rows * columns; i++)
     {
-        if (getTableValue(backTable, rows, columns, i / columns, i % columns) == BOMB)
+        if (getTableValue(backTable, columns, i / columns, i % columns) == BOMB)
         {
-            if (getTableValue(frontTable, rows, columns, i / columns, i % columns) != FLAG)
+            if (getTableValue(frontTable, columns, i / columns, i % columns) != FLAG)
             {
-                editTable(frontTable, rows, columns, i / columns, i % columns, SHOWED_CELL);
+                editTable(frontTable, columns, i / columns, i % columns, SHOWED_CELL);
             }
         }
     }
@@ -119,20 +119,20 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
 {
     if (input == PLACE_FLAG)
     {
-        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
         {
-            editTable(frontTable, rows, columns, y, x, FLAG);
+            editTable(frontTable, columns, y, x, FLAG);
         }
         else if (frontValue == FLAG)
         {
-            editTable(frontTable, rows, columns, y, x, HIDDEN_CELL);
+            editTable(frontTable, columns, y, x, HIDDEN_CELL);
         }
     }
     else if (input == SHOW_CELL)
     {
-        int backValue = getTableValue(backTable, rows, columns, y, x);
-        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        int backValue = getTableValue(backTable, columns, y, x);
+        int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
         {
             if (backValue == BOMB)
@@ -171,30 +171,30 @@ int test()
     // 1-8 = nombre de bombes autour de la case
     // Bombe en (0, 0), (1, 1), (2, 2), (3, 3), (4, 4)
     int *backTable = generateTable(rows, columns);
-    editTable(backTable, rows, columns, 0, 0, BOMB);
-    editTable(backTable, rows, columns, 1, 1, BOMB);
-    editTable(backTable, rows, columns, 2, 2, BOMB);
-    editTable(backTable, rows, columns, 3, 3, BOMB);
-    editTable(backTable, rows, columns, 4, 4, BOMB);
-    editTable(backTable, rows, columns, 0, 1, 2);
-    editTable(backTable, rows, columns, 0, 2, 1);
-    editTable(backTable, rows, columns, 1, 0, 2);
-    editTable(backTable, rows, columns, 1, 2, 2);
-    editTable(backTable, rows, columns, 1, 3, 1);
-    editTable(backTable, rows, columns, 2, 0, 1);
-    editTable(backTable, rows, columns, 2, 1, 2);
-    editTable(backTable, rows, columns, 2, 3, 2);
-    editTable(backTable, rows, columns, 2, 4, 1);
-    editTable(backTable, rows, columns, 3, 1, 1);
-    editTable(backTable, rows, columns, 3, 2, 2);
-    editTable(backTable, rows, columns, 3, 4, 2);
-    editTable(backTable, rows, columns, 3, 5, 1);
-    editTable(backTable, rows, columns, 4, 2, 1);
-    editTable(backTable, rows, columns, 4, 3, 2);
-    editTable(backTable, rows, columns, 4, 5, 1);
-    editTable(backTable, rows, columns, 5, 3, 1);
-    editTable(backTable, rows, columns, 5, 4, 1);
-    editTable(backTable, rows, columns, 5, 5, 1);
+    editTable(backTable, columns, 0, 0, BOMB);
+    editTable(backTable, columns, 1, 1, BOMB);
+    editTable(backTable, columns, 2, 2, BOMB);
+    editTable(backTable, columns, 3, 3, BOMB);
+    editTable(backTable, columns, 4, 4, BOMB);
+    editTable(backTable, columns, 0, 1, 2);
+    editTable(backTable, columns, 0, 2, 1);
+    editTable(backTable, columns, 1, 0, 2);
+    editTable(backTable, columns, 1, 2, 2);
+    editTable(backTable, columns, 1, 3, 1);
+    editTable(backTable, columns, 2, 0, 1);
+    editTable(backTable, columns, 2, 1, 2);
+    editTable(backTable, columns, 2, 3, 2);
+    editTable(backTable, columns, 2, 4, 1);
+    editTable(backTable, columns, 3, 1, 1);
+    editTable(backTable, columns, 3, 2, 2);
+    editTable(backTable, columns, 3, 4, 2);
+    editTable(backTable, columns, 3, 5, 1);
+    editTable(backTable, columns, 4, 2, 1);
+    editTable(backTable, columns, 4, 3, 2);
+    editTable(backTable, columns, 4, 5, 1);
+    editTable(backTable, columns, 5, 3, 1);
+    editTable(backTable, columns, 5, 4, 1);
+    editTable(backTable, columns, 5, 5, 1);
 
     // Génération du tableau qui sera affiché
     // 0 = case cachée

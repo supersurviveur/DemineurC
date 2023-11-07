@@ -114,7 +114,7 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
  */
 void initializeGeneration(void)
 {
-    srand(time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
+    srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
 }
 
 #ifdef TEST

@@ -28,13 +28,13 @@ int main()
     free(contentGrid);
     contentGrid = creetableauaveclesbombes(width, height, nbBombs, cursorX, cursorY);
     // On joue le premer coup
-    userInput(action, contentGrid, displayGrid, width, height, nbBombs, &gameState, cursorX, cursorY);
+    userInput(action, contentGrid, displayGrid, height, width, nbBombs, &gameState, cursorX, cursorY);
 
     // On peut maintenant rentrer dans la boucle de jeu
     while (gameState == 0)
     {
         waitForInput(contentGrid, displayGrid, width, height, &cursorX, &cursorY, &action);
-        userInput(action, contentGrid, displayGrid, width, height, nbBombs, &gameState, cursorX, cursorY);
+        userInput(action, contentGrid, displayGrid, height, width, nbBombs, &gameState, cursorX, cursorY);
     }
     if (gameState == WON)
     {

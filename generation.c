@@ -19,10 +19,10 @@ int randomint(int min, int max)
 // prend un numero de ligne et un numero de colonne et renvoie l'entier correspondant (dans le tableau de nombredelignes lignes et de nombredecolonnes colonnes)
 int coordonneesenint(int nombredelignes, int nombredecolonnes, int ncolonne, int nligne)
 {
-    if (nombredecolonnes <= nligne)
-    {
-        nligne = nombredecolonnes;
-    }
+    // if (nombredecolonnes <= nligne)
+    // {
+    //     nligne = nombredecolonnes;
+    // }
     return nligne * nombredelignes + ncolonne;
 }
 
@@ -66,7 +66,7 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
     {
         for (int y = 0; y < 3; y++)
         {
-            if (0 <= lignedeint + y - 1 && lignedeint + y <= nombredecolonnes && 0 <= colonnedeint + x - 1 && colonnedeint + x <= nombredelignes)
+            if (0 <= lignedeint + y - 1 && lignedeint + y <= nombredelignes && 0 <= colonnedeint + x - 1 && colonnedeint + x <= nombredecolonnes)
             { // si la case existe
                 tableauvoisin[x + 3 * y] = coordonneesenint(nombredelignes, nombredecolonnes, colonnedeint + x - 1, lignedeint + y - 1);
             }

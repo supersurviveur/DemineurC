@@ -78,21 +78,26 @@ int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int colu
 
 void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y)
 {
-    if (getTableValue(backTable, rows, columns, y, x) != 0) return ;
+    editTable(frontTable, rows, columns, y, x, SHOWED_CELL);
+    if (getTableValue(backTable, rows, columns, y, x) != 0)
+        return;
     // Get all the values around the cell
     int *values = getAllTablesAroundCell(backTable, rows, columns, y, x);
     // Show the next cells if the value is 0
     // TODO: Fonction à corriger car pas toutes les cases sont affichées
     int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
     int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < 8; i++)
     {
-        int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]);
-        if (values[i] != BOMB && temp_value == HIDDEN_CELL)
-            editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
-        if (values[i] == 0 && temp_value == HIDDEN_CELL)
+        if (!(x + Xpos[i] < 0 || x + Xpos[i] >= columns || y + Ypos[i] < 0 || y + Ypos[i] >= rows))
         {
-            showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
+            int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]);
+            if (values[i] != BOMB && temp_value == HIDDEN_CELL)
+                editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
+            if (values[i] == 0 && temp_value == HIDDEN_CELL && (i == 1 || i == 3 || i == 4 || i == 6))
+            {
+                showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
+            }
         }
     }
     free(values);
@@ -128,7 +133,7 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
         {
             editTable(frontTable, rows, columns, y, x, FLAG);
             // TODO A revoir, si on place les drapeaux n'importe ou ca fonctionne
-            
+
             int nbFlags = countTable(frontTable, rows, columns, FLAG);
             if (nbFlags == bombNumbers)
             {
@@ -152,7 +157,6 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
             }
             else
             {
-                editTable(frontTable, rows, columns, y, x, SHOWED_CELL);
                 showCell(backTable, frontTable, rows, columns, x, y);
                 int nbShowedCells = countTable(frontTable, rows, columns, SHOWED_CELL);
                 if (nbShowedCells == rows * columns - bombNumbers)

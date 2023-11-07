@@ -6,6 +6,15 @@
 int initializeDisplay(void);
 
 /**
+ * @brief Get the size of the grid
+ * @param gridWidth Pointer to the width of the grid
+ * @param gridHeight Pointer to the height of the grid
+ * @param nbBombs Pointer to the number of bombs
+ * @return 0 if success, -1 if error
+ */
+int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs);
+
+/**
  * @brief Show the entire grid
  * @param contentGrid Grid with the content of each cell
  * @param displayGrid Grid with the state of each cell

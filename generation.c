@@ -50,7 +50,6 @@ int *creetableauvide(int nombredelignes, int nombredecolonnes)
     return table;
 }
 
-
 /*
 entrees :
     tableauvoisin : un tableau de 9 entier NECESSAIREMENT!!!!
@@ -82,14 +81,15 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
 }
 
 /*cree la grille de jeu en fonction du nombre de colonnes (nombredecolonnes) du nombre de lignes (nombredelignes) et du nombre de bombes (nombredebombes) de la grille*/
-int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nombredebombes)
+int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nombredebombes, int x, int y)
 {
     int *tableau = creetableauvide(nombredelignes, nombredecolonnes);                       // tableau est un tableau rempli de 0
     int nombredebombesencoreaplacer = nombredebombes % (nombredecolonnes * nombredelignes); // si le nombre de bombes est superieur a celui de la taille de la grille on se raporte a un nombre plus petit avec le modulo
     while (nombredebombesencoreaplacer > 0)
     {
-        int a = randomint(0, (nombredecolonnes * nombredelignes)); // a est une case du tableau
-        if (tableau[a] != BOMB)
+        int a = randomint(0, (nombredecolonnes * nombredelignes));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // a est une case du tableau
+        if (tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
+        )
         {
             tableau[a] = BOMB;
             intencoordonnees(nombredelignes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
@@ -108,8 +108,9 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     return tableau;
 }
 
-int initializeGeneration(void) {
-    srand(time(NULL));// initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
+int initializeGeneration(void)
+{
+    srand(time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
     return 0;
 }
 

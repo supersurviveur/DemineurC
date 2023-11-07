@@ -23,8 +23,8 @@
 
 // Define characters to display for each type of cell, in unicode or letters, depending on UNICODE_DISPLAY flag
 #ifdef UNICODE_DISPLAY
-#define SHOW_FLAG() "⚑ " // ⚑
-#define SHOW_BOMB() "⬤ " // ⬤
+#define SHOW_FLAG() "\u2691 " // ⚑
+#define SHOW_BOMB() "\u2b24 " // ⬤
 #else
 #define SHOW_FLAG() "D "
 #define SHOW_BOMB() "B "
@@ -103,7 +103,7 @@ int initializeWindowsConsole()
  * @brief Get input without pressing enter
  * @return input char
  */
-int getch()
+int _getch()
 {
     int ch;
     struct termios oldt;
@@ -175,6 +175,64 @@ char *print_cell(int type, int isCursor)
     // Reset colors
     sprintf(result + position, "%s", foregroundColors[0]);
     return result;
+}
+
+/**
+ * @brief Get the size of the grid
+ * @param gridWidth Pointer to the width of the grid
+ * @param gridHeight Pointer to the height of the grid
+ * @param nbBombs Pointer to the number of bombs
+ * @return 0 if success, -1 if error
+ */
+int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
+{
+    // Get width
+    printf("Enter grid width (must be >= 5): ");
+    while (scanf_s("%d", gridWidth) != 1 || *gridWidth <= 5)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter grid width (must be >= 5): ");
+    }
+    // Get height
+    printf("Enter grid height (must be >= 5): ");
+    while (scanf_s("%d", gridHeight) != 1 || *gridHeight <= 5)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter grid height (must be >= 5): ");
+    }
+    // Get difficulty
+    int difficulty;
+    printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
+    while (scanf_s("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 3)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
+    }
+
+    // Compute number of bombs
+    if (difficulty == 1) // 10% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) / 10;
+    }
+    else if (difficulty == 2) // 15% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) / 0.15;
+    }
+    else if (difficulty == 3) // 20% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) / 5;
+    }
+
+    return 0;
 }
 
 /**
@@ -323,10 +381,10 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
 int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, char *action)
 {
     // Initialize cursor position
-    int x = 0;
-    int y = 0;
-    int oldX = 0;
-    int oldY = 0;
+    int x = *coordX;
+    int y = *coordY;
+    int oldX = x;
+    int oldY = y;
     bool flag = 1;
     // Show grid
     showGameGrid(contentGrid, displayGrid, width, height, x, y);
@@ -336,7 +394,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         updateGameGrid(contentGrid, displayGrid, width, x, y, oldX, oldY);
         // Get input
         int input;
-        input = getch();
+        input = _getch();
         input = tolower(input);
 
         // Save old cursor position
@@ -389,12 +447,14 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
     return 0;
 }
 
-int displayWin(int *contentGrid, int *displayGrid, int width, int height) {
+int displayWin(int *contentGrid, int *displayGrid, int width, int height)
+{
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You won !");
     return 0;
 }
-int displayLoose(int *contentGrid, int *displayGrid, int width, int height) {
+int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
+{
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You lose !");
     return 0;
@@ -466,7 +526,8 @@ int test()
     printf("\e[?25h\e[1;1H\e[2J");
     return 0;
 }
-int main() {
+int main()
+{
     return test();
 }
 #endif

@@ -485,7 +485,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         {
             // If ctrl+c exit
             // Exit directly, process is stopped instantly
-            // TODO : free memory ?
+            *action = 'q';
             exit(1);
         }
         else if (input == 'f' || input == 'e')

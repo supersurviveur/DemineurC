@@ -108,11 +108,16 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     return tableau;
 }
 
+int initializeGeneration(void) {
+    srand(time(NULL));// initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
+    return 0;
+}
+
 #ifdef TEST
 int test()
 {
     printf("");
-    srand(time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
+    initializeGeneration();
 
     int *ttvide = creetableauaveclesbombes(nombredelignes, nombredecolonnes, 0);
     // ttvide est le tableau d'affichage

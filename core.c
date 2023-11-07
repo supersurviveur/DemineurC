@@ -111,13 +111,11 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
             }
         }
     }
-    printf("You lost !\n");
 }
 
 void winGame(int *backTable, int *frontTable, int rows, int columns, int *gameState)
 {
     *gameState = WON;
-    printf("You won !\n");
 }
 
 void userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x,
@@ -129,6 +127,8 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
         if (frontValue == HIDDEN_CELL)
         {
             editTable(frontTable, rows, columns, y, x, FLAG);
+            // TODO A revoir, si on place les drapeaux n'importe ou ca fonctionne
+            
             int nbFlags = countTable(frontTable, rows, columns, FLAG);
             if (nbFlags == bombNumbers)
             {

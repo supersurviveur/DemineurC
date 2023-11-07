@@ -127,7 +127,7 @@ int getch()
  * @brief Initialize display
  * @return 0 if success, -1 if error
  */
-int initializeDisplay()
+int initializeDisplay(void)
 {
     // On windows, we try to initialize the console
 #ifdef _WIN32
@@ -386,6 +386,15 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             flag = 0;
         }
     }
+    return 0;
+}
+
+int displayWin(int *contentGrid, int *displayGrid, int width, int height) {
+    showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
+    return 0;
+}
+int displayLoose(int *contentGrid, int *displayGrid, int width, int height) {
+    showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     return 0;
 }
 

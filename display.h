@@ -1,3 +1,10 @@
+
+/**
+ * @brief Initialize display
+ * @return 0 if success, -1 if error
+ */
+int initializeDisplay(void);
+
 /**
  * @brief Show the entire grid
  * @param contentGrid Grid with the content of each cell
@@ -22,3 +29,6 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
  * @return 0 if success, -1 if error
  */
 int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, char *action);
+
+int displayWin(int *contentGrid, int *displayGrid, int width, int height);
+int displayLoose(int *contentGrid, int *displayGrid, int width, int height);

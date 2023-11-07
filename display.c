@@ -332,7 +332,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
 int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
     // Write on console only where changes occurred
-    char *content = (char *)malloc(100 * sizeof(char));
+    char *content = (char *)malloc(200 * sizeof(char));
     int position = 0;
     // Edit old cursor
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)

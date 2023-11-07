@@ -23,14 +23,14 @@ int coordonneesenint(int nombredelignes, int nombredecolonnes, int ncolonne, int
     // {
     //     nligne = nombredecolonnes;
     // }
-    return nligne * nombredelignes + ncolonne;
+    return nligne * nombredecolonnes + ncolonne;
 }
 
 // prend un entier et met change la valeur du poiteur en le numero de la ligne pour la premiere valeur et le numero de la colonne pour la seconde
-void intencoordonnees(int nombredelignes, int n, int *pointeurcoordonnees)
+void intencoordonnees(int nombredecolonnes, int n, int *pointeurcoordonnees)
 {
-    pointeurcoordonnees[0] = n / nombredelignes;
-    pointeurcoordonnees[1] = n % nombredelignes;
+    pointeurcoordonnees[0] = n / nombredecolonnes;
+    pointeurcoordonnees[1] = n % nombredecolonnes;
 }
 
 // cree et renvoie un tableau renplie de 0 de taille nombredelignes * nombredecolonnes
@@ -93,7 +93,7 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
             tableau[a] = BOMB;
             int tablecoordonnees[2];
             int tablevoisins[9];
-            intencoordonnees(nombredelignes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
+            intencoordonnees(nombredecolonnes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
             listedesentierdevoisins(tablevoisins, nombredelignes, nombredecolonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a
             for (int i = 0; i < 9; i++)
             {

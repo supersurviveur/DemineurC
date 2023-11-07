@@ -141,6 +141,72 @@ int initializeDisplay(void)
 }
 
 /**
+ * @brief Restore display to default
+*/
+void restoreDisplay(void) {
+    // Only restore ascii things like cursor (sometimes it's useful)
+    printf("\e[?25h");
+}
+
+/**
+ * @brief Get the size of the grid
+ * @param gridWidth Pointer to the width of the grid
+ * @param gridHeight Pointer to the height of the grid
+ * @param nbBombs Pointer to the number of bombs
+ * @return 0 if success, -1 if error
+ */
+int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
+{
+    // Get width
+    printf("Enter grid width (must be >= 5): ");
+    while (scanf("%d", gridWidth) != 1 || *gridWidth < 5)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter grid width (must be >= 5): ");
+    }
+    // Get height
+    printf("Enter grid height (must be >= 5): ");
+    while (scanf("%d", gridHeight) != 1 || *gridHeight < 5)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter grid height (must be >= 5): ");
+    }
+    // Get difficulty
+    int difficulty;
+    printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
+    while (scanf("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 3)
+    {
+        fprintf(stderr, "Error: Invalid input\n");
+        // Clear input buffer
+        while (getchar() != '\n')
+            ;
+        printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
+    }
+
+    // Compute number of bombs
+    if (difficulty == 1) // 10% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) * 0.10;
+    }
+    else if (difficulty == 2) // 15% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) * 0.15;
+    }
+    else if (difficulty == 3) // 20% of the grid
+    {
+        *nbBombs = (*gridWidth * *gridHeight) * 0.20;
+    }
+
+    return 0;
+}
+
+/**
  * @brief Print a single cell
  * @param type Type of cell
  * @param isCursor 1 if cell is the cursor, 0 otherwise
@@ -175,64 +241,6 @@ char *print_cell(int type, int isCursor)
     // Reset colors
     sprintf(result + position, "%s", foregroundColors[0]);
     return result;
-}
-
-/**
- * @brief Get the size of the grid
- * @param gridWidth Pointer to the width of the grid
- * @param gridHeight Pointer to the height of the grid
- * @param nbBombs Pointer to the number of bombs
- * @return 0 if success, -1 if error
- */
-int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
-{
-    // Get width
-    printf("Enter grid width (must be >= 5): ");
-    while (scanf_s("%d", gridWidth) != 1 || *gridWidth <= 5)
-    {
-        fprintf(stderr, "Error: Invalid input\n");
-        // Clear input buffer
-        while (getchar() != '\n')
-            ;
-        printf("Enter grid width (must be >= 5): ");
-    }
-    // Get height
-    printf("Enter grid height (must be >= 5): ");
-    while (scanf_s("%d", gridHeight) != 1 || *gridHeight <= 5)
-    {
-        fprintf(stderr, "Error: Invalid input\n");
-        // Clear input buffer
-        while (getchar() != '\n')
-            ;
-        printf("Enter grid height (must be >= 5): ");
-    }
-    // Get difficulty
-    int difficulty;
-    printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
-    while (scanf_s("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 3)
-    {
-        fprintf(stderr, "Error: Invalid input\n");
-        // Clear input buffer
-        while (getchar() != '\n')
-            ;
-        printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
-    }
-
-    // Compute number of bombs
-    if (difficulty == 1) // 10% of the grid
-    {
-        *nbBombs = (*gridWidth * *gridHeight) / 10;
-    }
-    else if (difficulty == 2) // 15% of the grid
-    {
-        *nbBombs = (*gridWidth * *gridHeight) / 0.15;
-    }
-    else if (difficulty == 3) // 20% of the grid
-    {
-        *nbBombs = (*gridWidth * *gridHeight) / 5;
-    }
-
-    return 0;
 }
 
 /**
@@ -271,7 +279,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
                 position += sprintf(content[i] + position, "%s", cell);
                 free(cell);
             }
-            else if (displayGrid[i * width + j] == SHOWED_CELL)
+            else if (displayGrid[i * width + j] == VISIBLE_CELL)
             {
                 // Add the content of the cell
                 char *cell = print_cell(contentGrid[i * width + j], isCursor);
@@ -333,7 +341,7 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
-    else if (displayGrid[oldCursorY * width + oldCursorX] == SHOWED_CELL)
+    else if (displayGrid[oldCursorY * width + oldCursorX] == VISIBLE_CELL)
     {
         char *cell = print_cell(contentGrid[oldCursorY * width + oldCursorX], 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
@@ -350,7 +358,7 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
-    else if (displayGrid[cursorY * width + cursorX] == SHOWED_CELL)
+    else if (displayGrid[cursorY * width + cursorX] == VISIBLE_CELL)
     {
         char *cell = print_cell(contentGrid[cursorY * width + cursorX], 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
@@ -439,7 +447,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             *coordX = x;
             *coordY = y;
             // Pass action in pointer, depending on input
-            *action = input == 'f' ? PLACE_FLAG : SHOW_CELL;
+            *action = input == 'f' ? ACTION_PLACE_FLAG : ACTION_DIG;
             // Exit loop
             flag = 0;
         }
@@ -447,12 +455,26 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
     return 0;
 }
 
+/**
+ * @brief Display win message
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ */
 int displayWin(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You won !");
     return 0;
 }
+/**
+ * @brief Display lose message
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ */
 int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);

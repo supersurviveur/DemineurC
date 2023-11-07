@@ -6,7 +6,10 @@
 
 int main()
 {
-    initializeDisplay();
+    if(initializeDisplay() == -1) {
+        // Initialization failed
+        return 2;
+    }
     initializeGeneration();
     int width, height, nbBombs;
     getGameGridSize(&width, &height, &nbBombs);
@@ -41,4 +44,9 @@ int main()
     {
         displayLoose(contentGrid, displayGrid, width, height);
     }
+
+    free(contentGrid);
+    free(displayGrid);
+
+    restoreDisplay();
 }

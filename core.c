@@ -38,10 +38,11 @@ int *generateTable(int rows, int columns)
  * @param column The index of the column of the value to edit
  * @param value The new value
  */
-void editTable(int *table, int rows, int columns, int row, int column, int value)
+void editTable(int *table, int columns, int row, int column, int value)
 {
     table[row * columns + column] = value; // Edit the value of the cell in the linear table
 }
+
 
 /**
  * @brief Get the value of cell in a table
@@ -52,7 +53,7 @@ void editTable(int *table, int rows, int columns, int row, int column, int value
  * @param column The index of the column of the cell to get the value
  * @return
  */
-int getTableValue(int *table, int rows, int columns, int row, int column)
+int getTableValue(int *table, int columns, int row, int column)
 {
     return table[row * columns + column]; // Get the value of the cell in the linear table
 }
@@ -90,14 +91,19 @@ int countTable(const int *table, int rows, int columns, int value)
 int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int column)
 {
     int *values = generateTable(8, 1);
-    values[0] = getTableValue(table, rows, columns, row - 1, column - 1);
-    values[1] = getTableValue(table, rows, columns, row - 1, column);
-    values[2] = getTableValue(table, rows, columns, row - 1, column + 1);
-    values[3] = getTableValue(table, rows, columns, row, column - 1);
-    values[4] = getTableValue(table, rows, columns, row, column + 1);
-    values[5] = getTableValue(table, rows, columns, row + 1, column - 1);
-    values[6] = getTableValue(table, rows, columns, row + 1, column);
-    values[7] = getTableValue(table, rows, columns, row + 1, column + 1);
+    int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    for (int i = 0; i < 8; i++)
+    {
+        if (row + Ypos[i] < 0 || row + Ypos[i] >= rows || column + Xpos[i] < 0 || column + Xpos[i] >= columns)
+        {
+            values[i] = -1;
+        }
+        else
+        {
+            values[i] = getTableValue(table, columns, row + Ypos[i], column + Xpos[i]);
+        }
+    }
     return values;
 }
 
@@ -114,23 +120,27 @@ int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int colu
  */
 void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y)
 {
-    editTable(frontTable, rows, columns, y, x, SHOWED_CELL); // Edit the value of the cell to set to show it
-    if (getTableValue(backTable, rows, columns, y, x) != 0)
+    editTable(frontTable, columns, y, x, VISIBLE_CELL); // Edit the value of the cell to set to show it
+    if (getTableValue(backTable, columns, y, x) != 0)
         return; // If the value of the cell is not 0, stop the function
     // Get all the values around the cell
     int *values = getAllTablesAroundCell(backTable, rows, columns, y, x);
 
     // Get the position of the cells around the cell
+    editTable(frontTable, columns, y, x, VISIBLE_CELL);
+    if (getTableValue(backTable, columns, y, x) != 0)
+        return;
+    // Show the next cells if the value is 0
     int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
     int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
     for (int i = 0; i < 8; i++)
     {
         if (!(x + Xpos[i] < 0 || x + Xpos[i] >= columns || y + Ypos[i] < 0 || y + Ypos[i] >= rows)) // If the cell is in the table
         {
-            int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]); // Get the value of the cell
-            if (values[i] != BOMB && temp_value == HIDDEN_CELL) // If the cell is not a bomb and is hidden
-                editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL); // Show the cell
-            if (values[i] == 0 && temp_value == HIDDEN_CELL) // If the cell is 0 and is hidden and is around the cell
+            int temp_value = getTableValue(frontTable, columns, y + Ypos[i], x + Xpos[i]);
+            if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG))
+                editTable(frontTable, columns, y + Ypos[i], x + Xpos[i], VISIBLE_CELL); // If the cell is not a bomb and is hidden or flagged, show the cell
+            if (values[i] == 0 && temp_value == HIDDEN_CELL)
             {
                 showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]); // Show the cell and the cells around
             }
@@ -150,16 +160,16 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     *gameState = LOST; // Set the game to lost
     for (int i = 0; i < rows * columns; i++)
     {
-        if (getTableValue(backTable, rows, columns, i / columns, i % columns) == BOMB)
+        if (getTableValue(backTable, columns, i / columns, i % columns) == BOMB)
         {
-            if (getTableValue(frontTable, rows, columns, i / columns, i % columns) != FLAG)
+            if (getTableValue(frontTable, columns, i / columns, i % columns) != FLAG)
             {
-                // Show the bomb if it is not flagged
-                editTable(frontTable, rows, columns, i / columns, i % columns, SHOWED_CELL);
+                editTable(frontTable, columns, i / columns, i % columns, VISIBLE_CELL);
             }
         }
     }
 }
+
 
 /**
  * @brief Set the game to won
@@ -186,22 +196,22 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
                int y)
 {
     // Place or remove a flag
-    if (input == PLACE_FLAG)
+    if (input == ACTION_PLACE_FLAG)
     {
-        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
         {
-            editTable(frontTable, rows, columns, y, x, FLAG);
+            editTable(frontTable, columns, y, x, FLAG);
         }
         else if (frontValue == FLAG)
         {
-            editTable(frontTable, rows, columns, y, x, HIDDEN_CELL);
+            editTable(frontTable, columns, y, x, HIDDEN_CELL);
         }
     }
-    else if (input == SHOW_CELL)
+    else if (input == ACTION_DIG)
     {
-        int backValue = getTableValue(backTable, rows, columns, y, x);
-        int frontValue = getTableValue(frontTable, rows, columns, y, x);
+        int backValue = getTableValue(backTable, columns, y, x);
+        int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
         {
             if (backValue == BOMB)
@@ -211,10 +221,10 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
             else
             {
                 showCell(backTable, frontTable, rows, columns, x, y);
-                int nbShowedCells = countTable(frontTable, rows, columns, SHOWED_CELL);
+                int nbShowedCells = countTable(frontTable, rows, columns, VISIBLE_CELL);
                 if (nbShowedCells == rows * columns - bombNumbers)
                 {
-                    winGame(gameState);
+                    *gameState = WON;
                 }
             }
         }
@@ -229,7 +239,7 @@ int test()
     int rows = 6;
     int columns = 6;
     int bombNumbers = 5;
-    int gameState = PLAYING;
+    int gameState = 0;
     int x = 0;
     int y = 0;
     char input = 's';
@@ -240,30 +250,30 @@ int test()
     // 1-8 = nombre de bombes autour de la case
     // Bombe en (0, 0), (1, 1), (2, 2), (3, 3), (4, 4)
     int *backTable = generateTable(rows, columns);
-    editTable(backTable, rows, columns, 0, 0, BOMB);
-    editTable(backTable, rows, columns, 1, 1, BOMB);
-    editTable(backTable, rows, columns, 2, 2, BOMB);
-    editTable(backTable, rows, columns, 3, 3, BOMB);
-    editTable(backTable, rows, columns, 4, 4, BOMB);
-    editTable(backTable, rows, columns, 0, 1, 2);
-    editTable(backTable, rows, columns, 0, 2, 1);
-    editTable(backTable, rows, columns, 1, 0, 2);
-    editTable(backTable, rows, columns, 1, 2, 2);
-    editTable(backTable, rows, columns, 1, 3, 1);
-    editTable(backTable, rows, columns, 2, 0, 1);
-    editTable(backTable, rows, columns, 2, 1, 2);
-    editTable(backTable, rows, columns, 2, 3, 2);
-    editTable(backTable, rows, columns, 2, 4, 1);
-    editTable(backTable, rows, columns, 3, 1, 1);
-    editTable(backTable, rows, columns, 3, 2, 2);
-    editTable(backTable, rows, columns, 3, 4, 2);
-    editTable(backTable, rows, columns, 3, 5, 1);
-    editTable(backTable, rows, columns, 4, 2, 1);
-    editTable(backTable, rows, columns, 4, 3, 2);
-    editTable(backTable, rows, columns, 4, 5, 1);
-    editTable(backTable, rows, columns, 5, 3, 1);
-    editTable(backTable, rows, columns, 5, 4, 1);
-    editTable(backTable, rows, columns, 5, 5, 1);
+    editTable(backTable, columns, 0, 0, BOMB);
+    editTable(backTable, columns, 1, 1, BOMB);
+    editTable(backTable, columns, 2, 2, BOMB);
+    editTable(backTable, columns, 3, 3, BOMB);
+    editTable(backTable, columns, 4, 4, BOMB);
+    editTable(backTable, columns, 0, 1, 2);
+    editTable(backTable, columns, 0, 2, 1);
+    editTable(backTable, columns, 1, 0, 2);
+    editTable(backTable, columns, 1, 2, 2);
+    editTable(backTable, columns, 1, 3, 1);
+    editTable(backTable, columns, 2, 0, 1);
+    editTable(backTable, columns, 2, 1, 2);
+    editTable(backTable, columns, 2, 3, 2);
+    editTable(backTable, columns, 2, 4, 1);
+    editTable(backTable, columns, 3, 1, 1);
+    editTable(backTable, columns, 3, 2, 2);
+    editTable(backTable, columns, 3, 4, 2);
+    editTable(backTable, columns, 3, 5, 1);
+    editTable(backTable, columns, 4, 2, 1);
+    editTable(backTable, columns, 4, 3, 2);
+    editTable(backTable, columns, 4, 5, 1);
+    editTable(backTable, columns, 5, 3, 1);
+    editTable(backTable, columns, 5, 4, 1);
+    editTable(backTable, columns, 5, 5, 1);
 
     // Génération du tableau qui sera affiché
     // 0 = case cachée

@@ -4,14 +4,12 @@
 #include <time.h>
 #include "constants.h"
 
-int nombredelignes = 16;
-int nombredecolonnes = 32;
-int nombredebombe = 128;
-
-int tablecoordonnees[2]; // ne pas toucher
-int tablevoisins[9];     // ne pas toucher
-
-// randomin renvoie un nombre entier aleatoire entre min(inclue) et max(exclue)
+/**
+ * @brief Génère un nombre entier aleatoire entre min (inclus) et max (exclus)
+ * @param min Valeur minimale
+ * @param max Valeur maximale
+ * @return Le nombre aleatoire généré
+ */
 int randomint(int min, int max)
 {
     int n = (rand() % (max + 1 - min)) + min;
@@ -74,7 +72,7 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
             }
             else
             { // si la case ne existe pas
-                tableauvoisin[x + 3 * y] = coordonneesenint(nombredelignes, nombredecolonnes, colonnedeint, lignedeint);
+                tableauvoisin[x + 3 * y] = -1;
             }
         }
     }
@@ -87,17 +85,20 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     int nombredebombesencoreaplacer = nombredebombes % (nombredecolonnes * nombredelignes); // si le nombre de bombes est superieur a celui de la taille de la grille on se raporte a un nombre plus petit avec le modulo
     while (nombredebombesencoreaplacer > 0)
     {
-        int a = randomint(0, (nombredecolonnes * nombredelignes));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // a est une case du tableau
-        if (tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
+        int a = randomint(0, (nombredecolonnes * nombredelignes) - 1); // a est une case du tableau
+        if (
+            tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
         )
         {
             tableau[a] = BOMB;
+            int tablecoordonnees[2];
+            int tablevoisins[9];
             intencoordonnees(nombredelignes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
             listedesentierdevoisins(tablevoisins, nombredelignes, nombredecolonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a
             for (int i = 0; i < 9; i++)
             {
                 int b = tablevoisins[i];
-                if (tableau[b] != BOMB)
+                if (b != -1 && tableau[b] != BOMB)
                 {
                     tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisine) de 1
                 }
@@ -108,15 +109,20 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     return tableau;
 }
 
-int initializeGeneration(void)
+/**
+ * @brief Initialize raandom generation
+ */
+void initializeGeneration(void)
 {
-    srand(time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
-    return 0;
+    srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
 }
 
 #ifdef TEST
 int test()
 {
+    int nombredelignes = 16;
+    int nombredecolonnes = 32;
+    int nombredebombe = 128;
     printf("");
     initializeGeneration();
 
@@ -126,8 +132,8 @@ int test()
     int *ttbombe = creetableauaveclesbombes(nombredelignes, nombredecolonnes, nombredebombe);
     // ttbombe est le tableau avec les bombes et les choffres
 
-    printTable(ttvide, nombredelignes, nombredecolonnes);
-    printTable(ttbombe, nombredelignes, nombredecolonnes);
+    // printTable(ttvide, nombredelignes, nombredecolonnes);
+    // printTable(ttbombe, nombredelignes, nombredecolonnes);
 
     return 0;
 }

@@ -12,6 +12,7 @@
 #else
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #endif
 
 #include "constants.h"
@@ -97,6 +98,25 @@ int initializeWindowsConsole()
     }
     return 0;
 }
+
+// Function to get terminal size is also different on windows/linux
+/**
+ * @brief Get terminal size
+ * @param width Pointer to the width of the terminal
+ * @param height Pointer to the height of the terminal
+ * @return 0 if success, -1 if error
+ */
+int getTerminalSize(int *width, int *height)
+{
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+    {
+        return -1;
+    }
+    *width = csbi.dwSize.X-2;
+    *height = csbi.dwSize.Y-2;
+    return 0;
+}
 #else
 // On linux, we need to use a custom function to get input without pressing enter
 /**
@@ -121,6 +141,21 @@ int _getch()
 
     return ch;
 }
+
+/**
+ * @brief Get terminal size
+ * @param width Pointer to the width of the terminal
+ * @param height Pointer to the height of the terminal
+ * @return 0 if success, -1 if error
+ */
+int getTerminalSize(int *width, int *height)
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    *width = w.ws_col;
+    *height = w.ws_row;
+    return 0;
+}
 #endif
 
 /**
@@ -142,8 +177,9 @@ int initializeDisplay(void)
 
 /**
  * @brief Restore display to default
-*/
-void restoreDisplay(void) {
+ */
+void restoreDisplay(void)
+{
     // Only restore ascii things like cursor (sometimes it's useful)
     printf("\e[?25h");
 }
@@ -159,7 +195,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 {
     // Get width
     printf("Enter grid width (must be >= 5): ");
-    while (scanf("%d", gridWidth) != 1 || *gridWidth < 5)
+    while (scanf("%d", gridWidth) != 1 || (*gridWidth != 0 && *gridWidth < 5))
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer
@@ -167,15 +203,26 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
             ;
         printf("Enter grid width (must be >= 5): ");
     }
+    if (*gridWidth == 0)
+    {
+        int _temp;
+        getTerminalSize(gridWidth, &_temp);
+        *gridWidth = *gridWidth / 2;
+    }
     // Get height
     printf("Enter grid height (must be >= 5): ");
-    while (scanf("%d", gridHeight) != 1 || *gridHeight < 5)
+    while (scanf("%d", gridHeight) != 1 || (*gridHeight != 0 && *gridHeight < 5))
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
         printf("Enter grid height (must be >= 5): ");
+    }
+    if (*gridHeight == 0)
+    {
+        int _temp;
+        getTerminalSize(&_temp, gridHeight);
     }
     // Get difficulty
     int difficulty;
@@ -332,7 +379,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
 int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
     // Write on console only where changes occurred
-    char *content = (char *)malloc(100 * sizeof(char));
+    char *content = (char *)malloc(200 * sizeof(char));
     int position = 0;
     // Edit old cursor
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)

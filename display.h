@@ -11,6 +11,11 @@
 int initializeDisplay(void);
 
 /**
+ * @brief Restore display to default
+*/
+void restoreDisplay(void);
+
+/**
  * @brief Get the size of the grid
  * @param gridWidth Pointer to the width of the grid
  * @param gridHeight Pointer to the height of the grid

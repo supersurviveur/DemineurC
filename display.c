@@ -141,6 +141,14 @@ int initializeDisplay(void)
 }
 
 /**
+ * @brief Restore display to default
+*/
+void restoreDisplay(void) {
+    // Only restore ascii things like cursor (sometimes it's useful)
+    printf("\e[?25h");
+}
+
+/**
  * @brief Get the size of the grid
  * @param gridWidth Pointer to the width of the grid
  * @param gridHeight Pointer to the height of the grid

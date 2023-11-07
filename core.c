@@ -56,17 +56,22 @@ int countTable(const int *table, int rows, int columns, int value)
     return count;
 }
 
-int *getAllTablesAroundCell(int *table, int columns, int row, int column)
+int *getAllTablesAroundCell(int *table, int rows, int columns, int row, int column)
 {
     int *values = generateTable(8, 1);
-    values[0] = getTableValue(table, columns, row - 1, column - 1);
-    values[1] = getTableValue(table, columns, row - 1, column);
-    values[2] = getTableValue(table, columns, row - 1, column + 1);
-    values[3] = getTableValue(table, columns, row, column - 1);
-    values[4] = getTableValue(table, columns, row, column + 1);
-    values[5] = getTableValue(table, columns, row + 1, column - 1);
-    values[6] = getTableValue(table, columns, row + 1, column);
-    values[7] = getTableValue(table, columns, row + 1, column + 1);
+    int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    for (int i = 0; i < 8; i++)
+    {
+        if (row + Ypos[i] < 0 || row + Ypos[i] >= rows || column + Xpos[i] < 0 || column + Xpos[i] >= columns)
+        {
+            values[i] = -1;
+        }
+        else
+        {
+            values[i] = getTableValue(table, columns, row + Ypos[i], column + Xpos[i]);
+        }
+    }
     return values;
 }
 
@@ -78,9 +83,8 @@ void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int
     if (getTableValue(backTable, columns, y, x) != 0)
         return;
     // Get all the values around the cell
-    int *values = getAllTablesAroundCell(backTable, columns, y, x);
+    int *values = getAllTablesAroundCell(backTable, rows, columns, y, x);
     // Show the next cells if the value is 0
-    // TODO: Fonction à corriger car pas toutes les cases sont affichées
     int Xpos[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
     int Ypos[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
     for (int i = 0; i < 8; i++)

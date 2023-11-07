@@ -47,4 +47,6 @@ int main()
 
     free(contentGrid);
     free(displayGrid);
+
+    restoreDisplay();
 }

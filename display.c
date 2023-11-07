@@ -223,7 +223,6 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     {
         int _temp;
         getTerminalSize(&_temp, gridHeight);
-        *gridHeight = *gridHeight / 2;
     }
     // Get difficulty
     int difficulty;

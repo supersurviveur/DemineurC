@@ -1,3 +1,9 @@
+/**
+ * @file constants.h
+ * @brief Provides global constants for the game
+ * @authors Julien THILLARD, Clement DI-GALLO, Benjamin TRUC
+*/
+
 extern char const ACTION_PLACE_FLAG;
 extern char const ACTION_DIG;
 extern int const FLAG;

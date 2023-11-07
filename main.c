@@ -44,4 +44,7 @@ int main()
     {
         displayLoose(contentGrid, displayGrid, width, height);
     }
+
+    free(contentGrid);
+    free(displayGrid);
 }

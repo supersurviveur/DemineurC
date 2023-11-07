@@ -7,5 +7,6 @@ int const FLAG = 2;
 int const BOMB = -1;
 int const HIDDEN_CELL = 0;
 int const VISIBLE_CELL = 1;
+int const PLAYING = 0;
 int const WON = 1;
 int const LOST = 2;

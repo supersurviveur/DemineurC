@@ -4,8 +4,7 @@
  * @authors Julien THILLARD, Clement DI-GALLO, Benjamin TRUC
 */
 
-int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nombredebombes, int x, int y);
-int *creetableauvide(int nombredelignes, int nombredecolonnes);
+int *creeTabAvecBombes(int nombredecolonnes, int nombredelignes, int nombredebombes, int x, int y);
 
 /**
  * @brief Initialize raandom generation

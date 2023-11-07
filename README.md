@@ -1,5 +1,5 @@
 # DemineurC
-Projet de démineur en C pour le cours d'informatique de 1ère année de prépa MP2I au lycée Champollion.
+Projet de démineur en C pour le cours d'informatique de 1ʳᵉ année de prépa MP2I au lycée Champollion.
 Réalisé par [Di Gallo Clément](https://github.com/Merlode11), [Thillard Julien](https://github.com/supersurviveur) et [Truc Benjamin](https://github.com/TRUCBenjamin)
 
 ## Commandes de jeu

@@ -74,7 +74,7 @@ int *getAllTablesAroundCell(int *table, int columns, int row, int column)
 
 void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int y)
 {
-    editTable(frontTable, columns, y, x, SHOWED_CELL);
+    editTable(frontTable, columns, y, x, VISIBLE_CELL);
     if (getTableValue(backTable, columns, y, x) != 0)
         return;
     // Get all the values around the cell
@@ -89,7 +89,7 @@ void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int
         {
             int temp_value = getTableValue(frontTable, columns, y + Ypos[i], x + Xpos[i]);
             if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG))
-                editTable(frontTable, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
+                editTable(frontTable, columns, y + Ypos[i], x + Xpos[i], VISIBLE_CELL);
             if (values[i] == 0 && temp_value == HIDDEN_CELL)
             {
                 showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
@@ -108,7 +108,7 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
         {
             if (getTableValue(frontTable, columns, i / columns, i % columns) != FLAG)
             {
-                editTable(frontTable, columns, i / columns, i % columns, SHOWED_CELL);
+                editTable(frontTable, columns, i / columns, i % columns, VISIBLE_CELL);
             }
         }
     }
@@ -117,7 +117,7 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
 void userInput(char input, int *backTable, int *frontTable, int rows, int columns, int bombNumbers, int *gameState, int x,
                int y)
 {
-    if (input == PLACE_FLAG)
+    if (input == ACTION_PLACE_FLAG)
     {
         int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
@@ -129,7 +129,7 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
             editTable(frontTable, columns, y, x, HIDDEN_CELL);
         }
     }
-    else if (input == SHOW_CELL)
+    else if (input == ACTION_DIG)
     {
         int backValue = getTableValue(backTable, columns, y, x);
         int frontValue = getTableValue(frontTable, columns, y, x);
@@ -142,7 +142,7 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
             else
             {
                 showCell(backTable, frontTable, rows, columns, x, y);
-                int nbShowedCells = countTable(frontTable, rows, columns, SHOWED_CELL);
+                int nbShowedCells = countTable(frontTable, rows, columns, VISIBLE_CELL);
                 if (nbShowedCells == rows * columns - bombNumbers)
                 {
                     *gameState = WON;
@@ -160,7 +160,7 @@ int test()
     int rows = 6;
     int columns = 6;
     int bombNumbers = 5;
-    int gameState = PLAYING;
+    int gameState = 0;
     int x = 0;
     int y = 0;
     char input = 's';

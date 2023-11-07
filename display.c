@@ -271,7 +271,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
                 position += sprintf(content[i] + position, "%s", cell);
                 free(cell);
             }
-            else if (displayGrid[i * width + j] == SHOWED_CELL)
+            else if (displayGrid[i * width + j] == VISIBLE_CELL)
             {
                 // Add the content of the cell
                 char *cell = print_cell(contentGrid[i * width + j], isCursor);
@@ -333,7 +333,7 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
-    else if (displayGrid[oldCursorY * width + oldCursorX] == SHOWED_CELL)
+    else if (displayGrid[oldCursorY * width + oldCursorX] == VISIBLE_CELL)
     {
         char *cell = print_cell(contentGrid[oldCursorY * width + oldCursorX], 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
@@ -350,7 +350,7 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
-    else if (displayGrid[cursorY * width + cursorX] == SHOWED_CELL)
+    else if (displayGrid[cursorY * width + cursorX] == VISIBLE_CELL)
     {
         char *cell = print_cell(contentGrid[cursorY * width + cursorX], 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
@@ -439,7 +439,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             *coordX = x;
             *coordY = y;
             // Pass action in pointer, depending on input
-            *action = input == 'f' ? PLACE_FLAG : SHOW_CELL;
+            *action = input == 'f' ? ACTION_PLACE_FLAG : ACTION_DIG;
             // Exit loop
             flag = 0;
         }
@@ -447,12 +447,26 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
     return 0;
 }
 
+/**
+ * @brief Display win message
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ */
 int displayWin(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You won !");
     return 0;
 }
+/**
+ * @brief Display lose message
+ * @param contentGrid Grid with the content of each cell
+ * @param displayGrid Grid with the state of each cell
+ * @param width Width of the grid
+ * @param height Height of the grid
+ */
 int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);

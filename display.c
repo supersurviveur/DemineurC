@@ -486,8 +486,9 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         {
             // If ctrl+c exit
             // Exit directly, process is stopped instantly
-            *action = 'q';
-            exit(1);
+            *action = ACTION_QUIT;
+            // Exit loop
+            flag = 0;
         }
         else if (input == 'f' || input == 'e')
         {

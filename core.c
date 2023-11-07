@@ -92,9 +92,9 @@ void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int
         if (!(x + Xpos[i] < 0 || x + Xpos[i] >= columns || y + Ypos[i] < 0 || y + Ypos[i] >= rows))
         {
             int temp_value = getTableValue(frontTable, rows, columns, y + Ypos[i], x + Xpos[i]);
-            if (values[i] != BOMB && temp_value == HIDDEN_CELL)
+            if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG))
                 editTable(frontTable, rows, columns, y + Ypos[i], x + Xpos[i], SHOWED_CELL);
-            if (values[i] == 0 && temp_value == HIDDEN_CELL && (i == 1 || i == 3 || i == 4 || i == 6))
+            if (values[i] == 0 && temp_value == HIDDEN_CELL)
             {
                 showCell(backTable, frontTable, rows, columns, x + Xpos[i], y + Ypos[i]);
             }
@@ -132,13 +132,6 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
         if (frontValue == HIDDEN_CELL)
         {
             editTable(frontTable, rows, columns, y, x, FLAG);
-            // TODO A revoir, si on place les drapeaux n'importe ou ca fonctionne
-
-            int nbFlags = countTable(frontTable, rows, columns, FLAG);
-            if (nbFlags == bombNumbers)
-            {
-                winGame(backTable, frontTable, rows, columns, gameState);
-            }
         }
         else if (frontValue == FLAG)
         {

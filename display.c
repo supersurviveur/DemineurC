@@ -391,10 +391,12 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
 
 int displayWin(int *contentGrid, int *displayGrid, int width, int height) {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
+    printf("You won !");
     return 0;
 }
 int displayLoose(int *contentGrid, int *displayGrid, int width, int height) {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
+    printf("You lose !");
     return 0;
 }
 

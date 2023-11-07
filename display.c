@@ -194,14 +194,14 @@ void restoreDisplay(void)
 int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 {
     // Get width
-    printf("Enter grid width (must be >= 5): ");
+    printf("Enter grid width (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridWidth) != 1 || (*gridWidth != 0 && *gridWidth < 5))
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
-        printf("Enter grid width (must be >= 5): ");
+        printf("Enter grid width (must be >= 5, or 0 to take the width of the console): ");
     }
     if (*gridWidth == 0)
     {
@@ -210,19 +210,20 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
         *gridWidth = *gridWidth / 2;
     }
     // Get height
-    printf("Enter grid height (must be >= 5): ");
+    printf("Enter grid height (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridHeight) != 1 || (*gridHeight != 0 && *gridHeight < 5))
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
-        printf("Enter grid height (must be >= 5): ");
+        printf("Enter grid height (must be >= 5, or 0 to take the width of the console): ");
     }
     if (*gridHeight == 0)
     {
         int _temp;
         getTerminalSize(&_temp, gridHeight);
+        *gridHeight = *gridHeight - 2;
     }
     // Get difficulty
     int difficulty;

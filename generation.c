@@ -17,12 +17,8 @@ int randomint(int min, int max)
 }
 
 // prend un numero de ligne et un numero de colonne et renvoie l'entier correspondant (dans le tableau de nombredelignes lignes et de nombredecolonnes colonnes)
-int coordonneesenint(int nombredelignes, int nombredecolonnes, int ncolonne, int nligne)
+int coordonneesenint(int nombredecolonnes, int ncolonne, int nligne)
 {
-    // if (nombredecolonnes <= nligne)
-    // {
-    //     nligne = nombredecolonnes;
-    // }
     return nligne * nombredecolonnes + ncolonne;
 }
 
@@ -68,7 +64,7 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
         {
             if (0 <= lignedeint + y - 1 && lignedeint + y <= nombredelignes && 0 <= colonnedeint + x - 1 && colonnedeint + x <= nombredecolonnes)
             { // si la case existe
-                tableauvoisin[x + 3 * y] = coordonneesenint(nombredelignes, nombredecolonnes, colonnedeint + x - 1, lignedeint + y - 1);
+                tableauvoisin[x + 3 * y] = coordonneesenint(nombredecolonnes, colonnedeint + x - 1, lignedeint + y - 1);
             }
             else
             { // si la case ne existe pas
@@ -87,7 +83,7 @@ int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nomb
     {
         int a = randomint(0, (nombredecolonnes * nombredelignes) - 1); // a est une case du tableau
         if (
-            tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
+            tableau[a] != BOMB && a != coordonneesenint(nombredecolonnes, x, y) && a != coordonneesenint(nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
         )
         {
             tableau[a] = BOMB;

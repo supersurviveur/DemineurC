@@ -188,7 +188,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 {
     // Get width
     printf("Enter grid width (must be >= 5): ");
-    while (scanf_s("%d", gridWidth) != 1 || *gridWidth <= 5)
+    while (scanf_s("%d", gridWidth) != 1 || *gridWidth < 5)
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer
@@ -198,7 +198,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     }
     // Get height
     printf("Enter grid height (must be >= 5): ");
-    while (scanf_s("%d", gridHeight) != 1 || *gridHeight <= 5)
+    while (scanf_s("%d", gridHeight) != 1 || *gridHeight < 5)
     {
         fprintf(stderr, "Error: Invalid input\n");
         // Clear input buffer

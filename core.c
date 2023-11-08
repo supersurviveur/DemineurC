@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>         
+#include <assert.h>
 
 #include "constants.h"
 #include "display.h"
@@ -249,32 +250,21 @@ int test()
     // 0 = case vide
     // -1 = bombe
     // 1-8 = nombre de bombes autour de la case
-    // Bombe en (0, 0), (1, 1), (2, 2), (3, 3), (4, 4)
+    // Bombe en (0, 0), (1, 1)
     int *backTable = generateTable(rows, columns);
     editTable(backTable, columns, 0, 0, BOMB);
+    assert(getTableValue(backTable, columns, 0, 0) == BOMB);
+    assert(getTableValue(backTable, columns, 1, 1) == 0);
     editTable(backTable, columns, 1, 1, BOMB);
-    editTable(backTable, columns, 2, 2, BOMB);
-    editTable(backTable, columns, 3, 3, BOMB);
-    editTable(backTable, columns, 4, 4, BOMB);
+    assert(getTableValue(backTable, columns, 1, 1) == BOMB);
+    assert(getTableValue(backTable, columns, 0, 1) == 0);
+
     editTable(backTable, columns, 0, 1, 2);
+    assert(getTableValue(backTable, columns, 0, 1) == 2);
     editTable(backTable, columns, 0, 2, 1);
-    editTable(backTable, columns, 1, 0, 2);
-    editTable(backTable, columns, 1, 2, 2);
-    editTable(backTable, columns, 1, 3, 1);
-    editTable(backTable, columns, 2, 0, 1);
-    editTable(backTable, columns, 2, 1, 2);
-    editTable(backTable, columns, 2, 3, 2);
-    editTable(backTable, columns, 2, 4, 1);
-    editTable(backTable, columns, 3, 1, 1);
-    editTable(backTable, columns, 3, 2, 2);
-    editTable(backTable, columns, 3, 4, 2);
-    editTable(backTable, columns, 3, 5, 1);
-    editTable(backTable, columns, 4, 2, 1);
-    editTable(backTable, columns, 4, 3, 2);
-    editTable(backTable, columns, 4, 5, 1);
-    editTable(backTable, columns, 5, 3, 1);
-    editTable(backTable, columns, 5, 4, 1);
-    editTable(backTable, columns, 5, 5, 1);
+    assert(getTableValue(backTable, columns, 0, 2) == 1);
+    editTable(backTable, columns, 0, 2, 5);
+    assert(getTableValue(backTable, columns, 0, 2) == 5);
 
     // Génération du tableau qui sera affiché
     // 0 = case cachée
@@ -282,44 +272,32 @@ int test()
     // 2 = case avec un drapeau
     int *frontTable = generateTable(rows, columns);
 
-    // Affichage des tableaux
-    printf("Initial tables:\n");
-    printTable(frontTable, rows, columns);
-    printTable(backTable, rows, columns);
-
     // Mise en place du jeu sans interaction utilisateur
     printf("Show the (0,4) character\n");
     x = 0;
     y = 4;
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
-    printTable(frontTable, rows, columns);
-    printTable(backTable, rows, columns);
 
     printf("Flag the (0,0) character\n");
     x = 0;
     y = 0;
     input = 'f';
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
-    printTable(frontTable, rows, columns);
-    printTable(backTable, rows, columns);
 
     printf("Show the (0,0) character\n");
     x = 0;
     y = 0;
     input = 's';
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
-    printTable(frontTable, rows, columns);
-    printTable(backTable, rows, columns);
 
     printf("Show the (1,1) character\n");
     x = 1;
     y = 1;
     input = 's';
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
-    printTable(frontTable, rows, columns);
-    printTable(backTable, rows, columns);
 
     printf("Game state: %d\n", gameState);
+    return 0;
 }
 int main()
 {

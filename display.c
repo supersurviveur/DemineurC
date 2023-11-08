@@ -549,8 +549,8 @@ int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
     return 0;
 }
 
-// If TEST is defined, we create a random grid and show it
-#ifdef TEST
+
+#ifdef TEST_DISPLAY
 int test()
 {
     initializeDisplay();
@@ -619,4 +619,4 @@ int main()
 {
     return test();
 }
-#endif
+#endif // TEST_DISPLAY

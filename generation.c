@@ -4,7 +4,7 @@
 #include "core.h"
 
 /**
- * @brief Génère un nombre entier aléatoire entre min (inclus) et max (exclus)
+ * @brief Génère un nombre entier aléatoire entre min (inclus) et max (inclus)
  * @param min Valeur minimale
  * @param max Valeur maximale
  * @return Le nombre aléatoire généré
@@ -98,7 +98,7 @@ void initializeGeneration()
     srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombres pseudo-aléatoire a la valeur du temps pour ne pas avoir toujours la meme grille
 }
 
-#ifdef TEST
+#ifdef TEST_GENERATION
 int test()
 {
     int nombredelignes = 16;
@@ -122,4 +122,4 @@ int main()
 {
     return test();
 }
-#endif
+#endif // TEST_GENERATION

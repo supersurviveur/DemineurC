@@ -26,10 +26,6 @@ int *generateTable(int rows, int columns)
     return table;
 }
 
-// void freeTable(int *table) {
-//     free(table);
-// }
-
 /**
  * @brief Edit value of a table
  * @param table The table to edit
@@ -43,7 +39,6 @@ void editTable(int *table, int columns, int row, int column, int value)
 {
     table[row * columns + column] = value; // Edit the value of the cell in the linear table
 }
-
 
 /**
  * @brief Get the value of cell in a table
@@ -171,7 +166,6 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     }
 }
 
-
 /**
  * @brief Set the game to won
  * @param gameState Pointer to the game state
@@ -238,7 +232,7 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
     }
 }
 
-#ifdef TEST
+#ifdef TEST_CORE
 int test()
 {
     // Tester le jeu avec génération du tableau, mise en place des bombes à des endroits précis, différentes entrées utilisateur, la fin du jeu
@@ -331,4 +325,4 @@ int main()
 {
     return test();
 }
-#endif
+#endif // TEST_CORE

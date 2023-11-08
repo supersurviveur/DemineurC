@@ -9,4 +9,4 @@ int *creeTabAvecBombes(int nombredecolonnes, int nombredelignes, int nombredebom
 /**
  * @brief Initialize raandom generation
 */
-void initializeGeneration(void);
+void initializeGeneration();

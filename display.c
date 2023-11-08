@@ -1,8 +1,5 @@
 #define UNICODE_DISPLAY // To remove if we use cmd or powershell
 
-// TODO add comments
-// TODO better error handling
-
 // Includes different libraries depending on the OS
 // These libs are used for getting input without pressing enter, and for ascii colors on windows
 // _WIN32 is defined by the compiler
@@ -109,12 +106,15 @@ int initializeWindowsConsole()
 int getTerminalSize(int *width, int *height)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
+    // Get infos on the console size
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
     {
+        // Function fail
         return -1;
     }
-    *width = csbi.dwSize.X-2;
-    *height = csbi.dwSize.Y-2;
+    // Pointer get the value-2, to be sure to fit in the size of the console
+    *width = csbi.dwSize.X - 2;
+    *height = csbi.dwSize.Y - 2;
     return 0;
 }
 #else
@@ -151,9 +151,15 @@ int _getch()
 int getTerminalSize(int *width, int *height)
 {
     struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    *width = w.ws_col;
-    *height = w.ws_row;
+    // Get infos on the console size
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
+    {
+        // Function fail
+        return -1;
+    }
+    // Pointer get the value-2, to be sure to fit in the size of the console
+    *width = w.ws_col - 2;
+    *height = w.ws_row - 2;
     return 0;
 }
 #endif
@@ -162,7 +168,7 @@ int getTerminalSize(int *width, int *height)
  * @brief Initialize display
  * @return 0 if success, -1 if error
  */
-int initializeDisplay(void)
+int initializeDisplay()
 {
     // On windows, we try to initialize the console
 #ifdef _WIN32
@@ -178,7 +184,7 @@ int initializeDisplay(void)
 /**
  * @brief Restore display to default
  */
-void restoreDisplay(void)
+void restoreDisplay()
 {
     // Only restore ascii things like cursor (sometimes it's useful)
     printf("\e[?25h");
@@ -197,7 +203,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     printf("Enter grid width (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridWidth) != 1 || (*gridWidth != 0 && *gridWidth < 5))
     {
-        fprintf(stderr, "Error: Invalid input\n");
+        printf("Error: Invalid input");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -213,7 +219,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     printf("Enter grid height (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridHeight) != 1 || (*gridHeight != 0 && *gridHeight < 5))
     {
-        fprintf(stderr, "Error: Invalid input\n");
+        printf("Error: Invalid input");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -223,14 +229,14 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     {
         int _temp;
         getTerminalSize(&_temp, gridHeight);
-        *gridHeight = *gridHeight - 2;
+        *gridHeight = *gridHeight;
     }
     // Get difficulty
     int difficulty;
     printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
     while (scanf("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 3)
     {
-        fprintf(stderr, "Error: Invalid input\n");
+        printf("Error: Invalid input");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -339,7 +345,6 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
                 // Add an empty hidden cell
                 // Choose background color depending on isCursor value
                 char *c = backgroundColors[isCursor ? 3 : 2];
-                // Add an empty cell
                 position += sprintf(content[i] + position, "%s  %s", c, foregroundColors[0]);
             }
         }
@@ -385,35 +390,41 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
     // Edit old cursor
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)
     {
+        // Add a flag
         char *cell = print_cell(-2, 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
     else if (displayGrid[oldCursorY * width + oldCursorX] == VISIBLE_CELL)
     {
+        // Add the content of the cell
         char *cell = print_cell(contentGrid[oldCursorY * width + oldCursorX], 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
     else
     {
+        // Add an empty hidden cell
         position += sprintf(content, "\e[%d;%dH%s  %s", oldCursorY + 1, oldCursorX * 2 + 1, backgroundColors[2], foregroundColors[0]);
     }
-    // // Edit new cursor
+    // Edit new cursor
     if (displayGrid[cursorY * width + cursorX] == FLAG)
     {
+        // Add a flag
         char *cell = print_cell(-2, 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
     else if (displayGrid[cursorY * width + cursorX] == VISIBLE_CELL)
     {
+        // Add the content of the cell
         char *cell = print_cell(contentGrid[cursorY * width + cursorX], 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
     else
     {
+        // Add an empty hidden cell
         position += sprintf(content + position, "\e[%d;%dH%s  %s", cursorY + 1, cursorX * 2 + 1, backgroundColors[3], foregroundColors[0]);
     }
     // Show changes
@@ -449,8 +460,7 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         // Update grid
         updateGameGrid(contentGrid, displayGrid, width, x, y, oldX, oldY);
         // Get input
-        int input;
-        input = _getch();
+        int input = _getch();
         input = tolower(input);
 
         // Save old cursor position
@@ -461,24 +471,28 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
         if (input == 'd')
         {
             x++;
+            // Don't go outside the grid
             if (x >= width)
                 x = width - 1;
         }
         else if (input == 'q')
         {
             x--;
+            // Don't go outside the grid
             if (x < 0)
                 x = 0;
         }
         else if (input == 'z')
         {
             y--;
+            // Don't go outside the grid
             if (y < 0)
                 y = 0;
         }
         else if (input == 's')
         {
             y++;
+            // Don't go outside the grid
             if (y >= height)
                 y = height - 1;
         }

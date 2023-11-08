@@ -93,7 +93,7 @@ int *creeTabAvecBombes(int nombredecolonnes, int nombredelignes, int nombredebom
 /**
  * @brief Initialize random generation
  */
-void initializeGeneration(void)
+void initializeGeneration()
 {
     srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombres pseudo-aléatoire a la valeur du temps pour ne pas avoir toujours la meme grille
 }

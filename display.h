@@ -8,12 +8,12 @@
  * @brief Initialize display
  * @return 0 if success, -1 if failure
  */
-int initializeDisplay(void);
+int initializeDisplay();
 
 /**
  * @brief Restore display to default
 */
-void restoreDisplay(void);
+void restoreDisplay();
 
 /**
  * @brief Get the size of the grid

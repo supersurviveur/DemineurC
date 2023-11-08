@@ -211,8 +211,10 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     }
     if (*gridWidth == 0)
     {
+        // If input is 0, get the width of the console
         int _temp;
         getTerminalSize(gridWidth, &_temp);
+        // Divide by 2, because one cell is represented by 2 char
         *gridWidth = *gridWidth / 2;
     }
     // Get height
@@ -227,9 +229,11 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     }
     if (*gridHeight == 0)
     {
+        // If input is 0, get the height of the console
         int _temp;
         getTerminalSize(&_temp, gridHeight);
-        *gridHeight = *gridHeight;
+        // Remove 1 to be sure to fit in the size of the console
+        *gridHeight = *gridHeight - 1;
     }
     // Get difficulty
     int difficulty;

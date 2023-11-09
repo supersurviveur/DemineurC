@@ -21,19 +21,16 @@
 
 // Define characters to display for each type of cell, in unicode or letters, depending on UNICODE_DISPLAY flag
 #ifdef UNICODE_DISPLAY
-#define SHOW_FLAG() "\u2691 " // ⚑
-#define SHOW_BOMB() "\u2b24 " // ⬤
+#define SHOW_FLAG() "\e[1;31m\u2691 "            // ⚑
+#define SHOW_BOMB() "\e[1m\e[38;2;0;0;0m\u2b24 " // ⬤
 #else
-#define SHOW_FLAG() "D "
-#define SHOW_BOMB() "B "
+#define SHOW_FLAG() "\e[1;31mD "            // D
+#define SHOW_BOMB() "\e[1m\e[38;2;0;0;0mB " // B
 #endif
 
 // Colors for texts
 char *foregroundColors[] = {
     "\e[0m", // RESET
-
-    "\e[1;31m",            // FLAG_CELL
-    "\e[1m\e[38;2;0;0;0m", // BOMB
     // NUMBERS
     // 1 #0101FF
     "\e[1m\e[38;2;1;1;255m",
@@ -286,31 +283,34 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
  * @param isCursor 1 if cell is the cursor, 0 otherwise
  * @return String to print
  */
-char *print_cell(int type, int isCursor)
+char *printCell(int type, int isCursor)
 {
     // Allocate memory for result
     char *result = (char *)allocateMemory(100 * sizeof(char));
-    // Choose background color depending on isCursor value
-    int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
-    if (type == 'f')
+    char *content;
+    if (type == -2)
     {
-        // Show a flag
-        position += sprintf(result + position, "%s%s", foregroundColors[1], SHOW_FLAG());
+        content = SHOW_FLAG();
     }
     else if (type == BOMB)
     {
-        // Show a bomb
-        position += sprintf(result + position, "%s%s", foregroundColors[2], SHOW_BOMB());
+        content = SHOW_BOMB();
     }
     else if (type == 0)
     {
         // Show an empty cell
-        position += sprintf(result + position, "  ");
+        content = "  ";
+    } else {
+        // Show the color associated with the number of bombs around
+        content = foregroundColors[type];
     }
-    else
+
+    // Choose background color depending on isCursor value, and then print the content
+    int position = sprintf(result, "%s%s", backgroundColors[isCursor ? 3 : 1], content);
+    if (type > 0)
     {
-        // Show the number of bombs around
-        position += sprintf(result + position, "%s%d ", foregroundColors[type + 2], type);
+        // If the case must show the number of bombs around, add the number
+        position += sprintf(result + position, "%d ", type);
     }
     // Reset colors
     sprintf(result + position, "%s", foregroundColors[0]);
@@ -349,14 +349,14 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
             if (displayGrid[i * width + j] == FLAG_CELL)
             {
                 // Add a flag
-                char *cell = print_cell('f', isCursor);
+                char *cell = printCell(-2, isCursor);
                 position += sprintf(content[i] + position, "%s", cell);
                 free(cell);
             }
             else if (displayGrid[i * width + j] == VISIBLE_CELL)
             {
                 // Add the content of the cell
-                char *cell = print_cell(contentGrid[i * width + j], isCursor);
+                char *cell = printCell(contentGrid[i * width + j], isCursor);
                 position += sprintf(content[i] + position, "%s", cell);
                 free(cell);
             }
@@ -411,14 +411,14 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = print_cell('f', 0);
+        char *cell = printCell(-2, 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
     else if (displayGrid[oldCursorY * width + oldCursorX] == VISIBLE_CELL)
     {
         // Add the content of the cell
-        char *cell = print_cell(contentGrid[oldCursorY * width + oldCursorX], 0);
+        char *cell = printCell(contentGrid[oldCursorY * width + oldCursorX], 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
@@ -431,14 +431,14 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
     if (displayGrid[cursorY * width + cursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = print_cell('f', 1);
+        char *cell = printCell(-2, 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
     else if (displayGrid[cursorY * width + cursorX] == VISIBLE_CELL)
     {
         // Add the content of the cell
-        char *cell = print_cell(contentGrid[cursorY * width + cursorX], 1);
+        char *cell = printCell(contentGrid[cursorY * width + cursorX], 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }

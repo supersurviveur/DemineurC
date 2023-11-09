@@ -1,5 +1,3 @@
-#define UNICODE_DISPLAY // To remove if we use cmd or powershell
-
 // Includes different libraries depending on the OS
 // These libs are used for getting input without pressing enter, and for ascii colors on windows
 // _WIN32 is defined by the compiler

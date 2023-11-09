@@ -173,6 +173,7 @@ int initializeDisplay()
         return -1;
     }
 #endif
+    printf("\e[?25l\e[1;1H\e[2J"); // hide cursor and clear screen
     return 0;
 }
 
@@ -209,11 +210,12 @@ void *allocateMemory(int size)
  */
 void getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 {
+    printf("\e[?25h"); // Restore cursor for inputs
     // Get width
     printf("Enter grid width (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridWidth) != 1 || (*gridWidth != 0 && *gridWidth < 5))
     {
-        printf("Error: Invalid input");
+        printf("Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -231,7 +233,7 @@ void getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     printf("Enter grid height (must be >= 5, or 0 to take the width of the console): ");
     while (scanf("%d", gridHeight) != 1 || (*gridHeight != 0 && *gridHeight < 5))
     {
-        printf("Error: Invalid input");
+        printf("Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -250,7 +252,7 @@ void getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     printf("Enter difficulty (Easy: 1, Normal: 2, Difficult: 3): ");
     while (scanf("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 3)
     {
-        printf("Error: Invalid input");
+        printf("Error: Invalid input\n");
         // Clear input buffer
         while (getchar() != '\n')
             ;
@@ -270,6 +272,7 @@ void getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     {
         *nbBombs = (*gridWidth * *gridHeight) * 0.20;
     }
+    printf("\e[?25l\e[1;1H\e[2J"); // hide cursor and clear screen for game
 }
 
 /**
@@ -367,7 +370,7 @@ void showGameGrid(int *contentGrid, const int *displayGrid, int width, int heigh
     }
     // Flatten content, to be able to show the entire grid in one call
     char *result = (char *)allocateMemory(height * width * 100 * sizeof(char));
-    int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J"); // Clear screen, hide cursor
+    int position = sprintf(result, "%s", "\e[1;1H"); // Clear screen, hide cursor
     for (int i = 0; i < height; i++)
     {
         // Add each line

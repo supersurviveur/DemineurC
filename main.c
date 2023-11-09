@@ -3,12 +3,13 @@
 #include "core.h"
 #include "constants.h"
 #include <malloc.h>
+#include <stdlib.h>
 
 int main()
 {
     if(initializeDisplay() == -1) {
         // Initialization failed
-        return 2;
+        exit(EXIT_FAILURE);
     }
     initializeGeneration();
     int width, height, nbBombs;

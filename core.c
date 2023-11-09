@@ -11,7 +11,7 @@
  * @brief Generate a table 2D with the given size
  * @param rows Number of rows
  * @param columns Number of columns
- * @return Pointer to the table if success, NULL if error
+ * @return Pointer to the table
  */
 int *generateTable(int rows, int columns)
 {

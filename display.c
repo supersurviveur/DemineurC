@@ -64,7 +64,7 @@ char *backgroundColors[] = {
 #ifdef _WIN32
 /**
  * @brief Initialize windows console to be able to use unicode characters and ascii colors
- * @return 0 if success, -1 if error
+ * @return 0 if success, -1 if failure
  */
 int initializeWindowsConsole()
 {
@@ -98,21 +98,20 @@ int initializeWindowsConsole()
  * @brief Get terminal size
  * @param width Pointer to the width of the terminal
  * @param height Pointer to the height of the terminal
- * @return 0 if success, -1 if error
  */
-int getTerminalSize(int *width, int *height)
+void getTerminalSize(int *width, int *height)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     // Get infos on the console size
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
     {
         // Function fail
-        return -1;
+        fprintf(stderr, "Error: Unable to get terminal size\n");
+        exit(EXIT_FAILURE);
     }
     // Pointer get the value-2, to be sure to fit in the size of the console
     *width = csbi.dwSize.X - 2;
     *height = csbi.dwSize.Y - 2;
-    return 0;
 }
 #else
 // On linux, we need to use a custom function to get input without pressing enter
@@ -143,7 +142,6 @@ int _getch()
  * @brief Get terminal size
  * @param width Pointer to the width of the terminal
  * @param height Pointer to the height of the terminal
- * @return 0 if success, -1 if error
  */
 int getTerminalSize(int *width, int *height)
 {
@@ -152,18 +150,18 @@ int getTerminalSize(int *width, int *height)
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
     {
         // Function fail
-        return -1;
+        fprintf(stderr, "Error: Unable to get terminal size\n");
+        exit(EXIT_FAILURE);
     }
     // Pointer get the value-2, to be sure to fit in the size of the console
     *width = w.ws_col - 2;
     *height = w.ws_row - 2;
-    return 0;
 }
 #endif
 
 /**
  * @brief Initialize display
- * @return 0 if success, -1 if error
+ * @return 0 if success, -1 if failure
  */
 int initializeDisplay()
 {
@@ -208,9 +206,8 @@ void *allocateMemory(int size)
  * @param gridWidth Pointer to the width of the grid
  * @param gridHeight Pointer to the height of the grid
  * @param nbBombs Pointer to the number of bombs
- * @return 0 if success, -1 if error
  */
-int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
+void getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 {
     // Get width
     printf("Enter grid width (must be >= 5, or 0 to take the width of the console): ");
@@ -273,8 +270,6 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
     {
         *nbBombs = (*gridWidth * *gridHeight) * 0.20;
     }
-
-    return 0;
 }
 
 /**
@@ -300,7 +295,9 @@ char *printCell(int type, int isCursor)
     {
         // Show an empty cell
         content = "  ";
-    } else {
+    }
+    else
+    {
         // Show the color associated with the number of bombs around
         content = foregroundColors[type];
     }
@@ -325,9 +322,8 @@ char *printCell(int type, int isCursor)
  * @param height Height of the grid
  * @param cursorX X position of the cursor
  * @param cursorY Y position of the cursor
- * @return 0 if success, -1 if error
  */
-int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height, int cursorX, int cursorY)
+void showGameGrid(int *contentGrid, const int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
     // Create a 2D array of strings
     char **content = (char **)allocateMemory(height * sizeof(char *));
@@ -388,7 +384,6 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
     }
     free(content);
     free(result);
-    return 0;
 }
 
 /**
@@ -400,9 +395,8 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
  * @param cursorY Y position of the cursor
  * @param oldCursorX X position of the cursor before the update
  * @param oldCursorY Y position of the cursor before the update
- * @return 0 if success, -1 if error
  */
-int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
+void updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
     // Write on console only where changes occurred
     char *content = (char *)allocateMemory(200 * sizeof(char));
@@ -451,7 +445,6 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
     fwrite(content, position, 1, stdout);
     // Free memory
     free(content);
-    return 0;
 }
 
 /**
@@ -463,9 +456,8 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
  * @param coordX Pointer to the X position of the cursor
  * @param coordY Pointer to the Y position of the cursor
  * @param action Pointer to the action realized by the user
- * @return 0 if success, -1 if error
  */
-int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, char *action)
+void waitForInput(int *contentGrid, int *displayGrid, int width, int height, int *coordX, int *coordY, char *action)
 {
     // Initialize cursor position
     int x = *coordX;
@@ -535,7 +527,6 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
             flag = 0;
         }
     }
-    return 0;
 }
 
 /**
@@ -545,11 +536,10 @@ int waitForInput(int *contentGrid, int *displayGrid, int width, int height, int 
  * @param width Width of the grid
  * @param height Height of the grid
  */
-int displayWin(int *contentGrid, int *displayGrid, int width, int height)
+void displayWin(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You won !");
-    return 0;
 }
 /**
  * @brief Display lose message
@@ -558,11 +548,10 @@ int displayWin(int *contentGrid, int *displayGrid, int width, int height)
  * @param width Width of the grid
  * @param height Height of the grid
  */
-int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
+void displayLoose(int *contentGrid, int *displayGrid, int width, int height)
 {
     showGameGrid(contentGrid, displayGrid, width, height, -1, -1);
     printf("You lose !");
-    return 0;
 }
 
 #ifdef TEST_DISPLAY

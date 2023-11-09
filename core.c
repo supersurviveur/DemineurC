@@ -289,6 +289,8 @@ int test()
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 1, 1);
     assert(getTableValue(frontTable, columns, 1, 1) == VISIBLE_CELL);
 
+    free(backTable);
+    free(frontTable);
     printf("Tests passed successfully\n");
     return 0;
 }

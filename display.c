@@ -141,7 +141,7 @@ int _getch()
  * @param width Pointer to the width of the terminal
  * @param height Pointer to the height of the terminal
  */
-int getTerminalSize(int *width, int *height)
+void getTerminalSize(int *width, int *height)
 {
     struct winsize w;
     // Get infos on the console size

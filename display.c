@@ -402,45 +402,58 @@ void updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cur
     // Write on console only where changes occurred
     char *content = (char *)allocateMemory(200 * sizeof(char));
     int position = 0;
+
     // Edit old cursor
+    char *cell;
+    bool needFree = true;
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = printCell(-2, 0);
-        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
-        free(cell);
+        cell = printCell(-2, 0);
     }
     else if (displayGrid[oldCursorY * width + oldCursorX] == VISIBLE_CELL)
     {
         // Add the content of the cell
-        char *cell = printCell(contentGrid[oldCursorY * width + oldCursorX], 0);
-        position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
-        free(cell);
+        cell = printCell(contentGrid[oldCursorY * width + oldCursorX], 0);
     }
     else
     {
-        // Add an empty hidden cell
-        position += sprintf(content, "\e[%d;%dH%s  %s", oldCursorY + 1, oldCursorX * 2 + 1, backgroundColors[2], foregroundColors[0]);
+        cell = backgroundColors[2];
+        needFree = false; // backgrounds colors doesn't come from malloc
     }
+    position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
+    if (needFree)
+        free(cell);
+    if (displayGrid[oldCursorY * width + oldCursorX] == HIDDEN_CELL)
+    {
+        // Add an empty hidden cell
+        position += sprintf(content + position, "  %s", foregroundColors[0]);
+    }
+
     // Edit new cursor
+    needFree = true;
     if (displayGrid[cursorY * width + cursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = printCell(-2, 1);
-        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
-        free(cell);
+        cell = printCell(-2, 1);
     }
     else if (displayGrid[cursorY * width + cursorX] == VISIBLE_CELL)
     {
         // Add the content of the cell
-        char *cell = printCell(contentGrid[cursorY * width + cursorX], 1);
-        position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
-        free(cell);
+        cell = printCell(contentGrid[cursorY * width + cursorX], 1);
     }
     else
     {
+        cell = backgroundColors[3];
+        needFree = false; // backgrounds colors doesn't come from malloc
+    }
+    position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
+    if (needFree)
+        free(cell);
+    if (displayGrid[cursorY * width + cursorX] == HIDDEN_CELL)
+    {
         // Add an empty hidden cell
-        position += sprintf(content + position, "\e[%d;%dH%s  %s", cursorY + 1, cursorX * 2 + 1, backgroundColors[3], foregroundColors[0]);
+        position += sprintf(content + position, "  %s", foregroundColors[0]);
     }
     // Show changes
     fwrite(content, position, 1, stdout);

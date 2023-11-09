@@ -191,6 +191,22 @@ void restoreDisplay()
 }
 
 /**
+ * @brief Allocate memory, and exit if error
+ * @param size Size of the memory to allocate
+ * @return Pointer to the allocated memory
+ */
+void *allocateMemory(int size)
+{
+    void *ptr = malloc(size);
+    if (ptr == NULL)
+    {
+        fprintf(stderr, "Error: Unable to allocate memory\n");
+        exit(EXIT_FAILURE);
+    }
+    return ptr;
+}
+
+/**
  * @brief Get the size of the grid
  * @param gridWidth Pointer to the width of the grid
  * @param gridHeight Pointer to the height of the grid
@@ -273,7 +289,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 char *print_cell(int type, int isCursor)
 {
     // Allocate memory for result
-    char *result = (char *)malloc(100 * sizeof(char));
+    char *result = (char *)allocateMemory(100 * sizeof(char));
     // Choose background color depending on isCursor value
     int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
     if (type == -2)
@@ -314,11 +330,11 @@ char *print_cell(int type, int isCursor)
 int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height, int cursorX, int cursorY)
 {
     // Create a 2D array of strings
-    char **content = (char **)malloc(height * sizeof(char *));
+    char **content = (char **)allocateMemory(height * sizeof(char *));
     for (int i = 0; i < height; i++)
     {
         // Allocate memory for each line
-        content[i] = (char *)malloc(width * 100 * sizeof(char));
+        content[i] = (char *)allocateMemory(width * 100 * sizeof(char));
         int position = 0;
         if (i != 0)
         {
@@ -354,7 +370,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
         }
     }
     // Flatten content, to be able to show the entire grid in one call
-    char *result = (char *)malloc(height * width * 100 * sizeof(char));
+    char *result = (char *)allocateMemory(height * width * 100 * sizeof(char));
     int position = sprintf(result, "%s", "\e[?25l\e[1;1H\e[2J"); // Clear screen, hide cursor
     for (int i = 0; i < height; i++)
     {
@@ -389,7 +405,7 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
 int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cursorX, int cursorY, int oldCursorX, int oldCursorY)
 {
     // Write on console only where changes occurred
-    char *content = (char *)malloc(200 * sizeof(char));
+    char *content = (char *)allocateMemory(200 * sizeof(char));
     int position = 0;
     // Edit old cursor
     if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)
@@ -549,7 +565,6 @@ int displayLoose(int *contentGrid, int *displayGrid, int width, int height)
     return 0;
 }
 
-
 #ifdef TEST_DISPLAY
 int test()
 {
@@ -558,7 +573,7 @@ int test()
     // Create grids
     int width = 10;
     int height = 10;
-    int *contentGrid = (int *)malloc(width * height * sizeof(int *));
+    int *contentGrid = (int *)allocateMemory(width * height * sizeof(int *));
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -567,7 +582,7 @@ int test()
             contentGrid[i * width + j] = rand() % 9;
         }
     }
-    int *displayGrid = (int *)malloc(width * height * sizeof(int *));
+    int *displayGrid = (int *)allocateMemory(width * height * sizeof(int *));
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)

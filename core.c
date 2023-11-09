@@ -18,7 +18,8 @@ int *generateTable(int rows, int columns)
     int *table = (int *)malloc(rows * columns * sizeof(int)); // Allocate memory for the linear table
     if (table == NULL)
     {
-        return NULL;
+        fprintf(stderr, "Error: Unable to allocate memory\n");
+        exit(EXIT_FAILURE);
     }
     for (int i = 0; i < rows * columns; i++)
     {

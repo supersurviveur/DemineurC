@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <time.h>
 #include "constants.h"
@@ -132,6 +133,8 @@ int test()
     assert(voisins[4] == 11);
     assert(voisins[5] == 12);
     assert(voisins[6] == 20);
+
+    printf("Tests passed successfully\n");
     return 0;
 }
 int main()

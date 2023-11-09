@@ -557,7 +557,11 @@ void displayLoose(int *contentGrid, int *displayGrid, int width, int height)
 #ifdef TEST_DISPLAY
 int test()
 {
-    initializeDisplay();
+    if (initializeDisplay() < 0)
+    {
+        fprintf(stderr, "Error: Unable to initialize display\n");
+        return -1;
+    }
 
     // Create grids
     int width = 10;
@@ -567,8 +571,7 @@ int test()
     {
         for (int j = 0; j < width; j++)
         {
-            // random content
-            contentGrid[i * width + j] = rand() % 9;
+            contentGrid[i * width + j] = 0;
         }
     }
     int *displayGrid = (int *)allocateMemory(width * height * sizeof(int *));
@@ -579,33 +582,43 @@ int test()
             displayGrid[i * width + j] = HIDDEN_CELL;
         }
     }
-    // add random bombs and flags
-    for (int i = 0; i < 10; i++)
-    {
-        // Compute random coords
-        int x = rand() % width;
-        int y = rand() % height;
-        // Add bomb
-        contentGrid[y * width + x] = BOMB;
-    }
-    for (int i = 0; i < 10; i++)
-    {
-        // Compute random coords
-        int x = rand() % width;
-        int y = rand() % height;
-        // Add flag
-        displayGrid[y * width + x] = FLAG_CELL;
-    }
 
-    // Show random numbers
-    for (int i = 0; i < 20; i++)
-    {
-        // Compute random coords
-        int x = rand() % width;
-        int y = rand() % height;
-        // Add flag
-        displayGrid[y * width + x] = SHOWED_CELL;
-    }
+    // add some content to test all possible numbers
+    contentGrid[2 * width + 1] = 1;
+    contentGrid[2 * width + 2] = 2;
+    contentGrid[2 * width + 3] = 3;
+    contentGrid[2 * width + 4] = 4;
+    contentGrid[2 * width + 5] = 5;
+    contentGrid[2 * width + 6] = 6;
+    contentGrid[2 * width + 7] = 7;
+    contentGrid[2 * width + 8] = 8;
+
+    // add some bombs
+    contentGrid[1 * width + 2] = BOMB;
+    contentGrid[1 * width + 3] = BOMB;
+    contentGrid[3 * width + 8] = BOMB;
+    contentGrid[4 * width + 1] = BOMB;
+    contentGrid[8 * width + 7] = BOMB;
+
+    // add some flags
+    displayGrid[3 * width + 2] = FLAG_CELL;
+    displayGrid[3 * width + 3] = FLAG_CELL;
+    displayGrid[3 * width + 8] = FLAG_CELL;
+    displayGrid[4 * width + 1] = FLAG_CELL;
+    displayGrid[8 * width + 7] = FLAG_CELL;
+
+    // Show some cells
+    displayGrid[1 * width + 2] = VISIBLE_CELL;
+    displayGrid[1 * width + 3] = VISIBLE_CELL;
+    displayGrid[6 * width + 4] = VISIBLE_CELL;
+    displayGrid[2 * width + 1] = VISIBLE_CELL;
+    displayGrid[2 * width + 2] = VISIBLE_CELL;
+    displayGrid[2 * width + 3] = VISIBLE_CELL;
+    displayGrid[2 * width + 4] = VISIBLE_CELL;
+    displayGrid[2 * width + 5] = VISIBLE_CELL;
+    displayGrid[2 * width + 6] = VISIBLE_CELL;
+    displayGrid[2 * width + 7] = VISIBLE_CELL;
+    displayGrid[2 * width + 8] = VISIBLE_CELL;
 
     int x, y;
     char action;
@@ -615,8 +628,7 @@ int test()
     free(contentGrid);
     free(displayGrid);
 
-    // Clear screen
-    printf("\e[?25h\e[1;1H\e[2J");
+    restoreDisplay();
     return 0;
 }
 int main()

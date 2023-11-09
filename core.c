@@ -243,9 +243,6 @@ int test()
     int columns = 6;
     int bombNumbers = 5;
     int gameState = 0;
-    int x = 0;
-    int y = 0;
-    char input = 's';
 
     // Génération du tableau avec les bombes et le nombre de bombes autour de chaque case
     // 0 = case vide
@@ -253,6 +250,8 @@ int test()
     // 1-8 = nombre de bombes autour de la case
     // Bombe en (0, 0), (1, 1)
     int *backTable = generateTable(rows, columns);
+    assert(getTableValue(backTable, columns, 0, 0) == 0);
+    assert(getTableValue(backTable, columns, 1, 1) == 0);
     editTable(backTable, columns, 0, 0, BOMB);
     assert(getTableValue(backTable, columns, 0, 0) == BOMB);
     assert(getTableValue(backTable, columns, 1, 1) == 0);
@@ -274,30 +273,23 @@ int test()
     int *frontTable = generateTable(rows, columns);
 
     // Mise en place du jeu sans interaction utilisateur
-    printf("Show the (0,4) character\n");
-    x = 0;
-    y = 4;
-    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
+    char input = 's';
+    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 4);
+    assert(getTableValue(frontTable, columns, 0, 4) == VISIBLE_CELL);
 
-    printf("Flag the (0,0) character\n");
-    x = 0;
-    y = 0;
     input = 'f';
-    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
+    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 0);
+    assert(getTableValue(frontTable, columns, 0, 0) == FLAG_CELL);
 
-    printf("Show the (0,0) character\n");
-    x = 0;
-    y = 0;
     input = 's';
-    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
+    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 0);
+    assert(getTableValue(frontTable, columns, 0, 0) == FLAG_CELL);
 
-    printf("Show the (1,1) character\n");
-    x = 1;
-    y = 1;
     input = 's';
-    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, x, y);
+    userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 1, 1);
+    assert(getTableValue(frontTable, columns, 1, 1) == VISIBLE_CELL);
 
-    printf("Game state: %d\n", gameState);
+    printf("Tests passed successfully\n");
     return 0;
 }
 int main()

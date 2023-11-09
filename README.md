@@ -18,6 +18,8 @@ gcc main.c display.c core.c generation.c constants.c -o demineur -O3
 ```
 puis exécutez le programme avec `demineur` ou `.\demineur` selon votre système d'exploitation.
 
+Sur windows, la librairie `windows.h` est nécessaire (Déjà installé dans de nombreux cas), et vous pouvez ajouter l'extension `.exe` au fichier compilé.
+
 Le drapeau `-DUNICODE_DISPLAY` peut être ajouté pour un affichage UTF-8 plus agréable (nécessite un terminal supportant l'UTF-8, l'invite de commande windows 10 n'est pas compatible, mais un terminal dans un éditeur tel que vscode fonctionne). \
 __Exemple :__ 
 ```bash

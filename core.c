@@ -136,7 +136,7 @@ void showCell(int *backTable, int *frontTable, int rows, int columns, int x, int
         if (!(x + Xpos[i] < 0 || x + Xpos[i] >= columns || y + Ypos[i] < 0 || y + Ypos[i] >= rows)) // If the cell is in the table
         {
             int temp_value = getTableValue(frontTable, columns, y + Ypos[i], x + Xpos[i]);
-            if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG))
+            if (values[i] != BOMB && (temp_value == HIDDEN_CELL || temp_value == FLAG_CELL))
                 editTable(frontTable, columns, y + Ypos[i], x + Xpos[i], VISIBLE_CELL); // If the cell is not a bomb and is hidden or flagged, show the cell
             if (values[i] == 0 && temp_value == HIDDEN_CELL)
             {
@@ -160,7 +160,7 @@ void loseGame(int *backTable, int *frontTable, int rows, int columns, int *gameS
     {
         if (getTableValue(backTable, columns, i / columns, i % columns) == BOMB)
         {
-            if (getTableValue(frontTable, columns, i / columns, i % columns) != FLAG)
+            if (getTableValue(frontTable, columns, i / columns, i % columns) != FLAG_CELL)
             {
                 editTable(frontTable, columns, i / columns, i % columns, VISIBLE_CELL);
             }
@@ -198,9 +198,9 @@ void userInput(char input, int *backTable, int *frontTable, int rows, int column
         int frontValue = getTableValue(frontTable, columns, y, x);
         if (frontValue == HIDDEN_CELL)
         {
-            editTable(frontTable, columns, y, x, FLAG);
+            editTable(frontTable, columns, y, x, FLAG_CELL);
         }
-        else if (frontValue == FLAG)
+        else if (frontValue == FLAG_CELL)
         {
             editTable(frontTable, columns, y, x, HIDDEN_CELL);
         }

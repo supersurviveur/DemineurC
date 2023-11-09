@@ -32,7 +32,7 @@
 char *foregroundColors[] = {
     "\e[0m", // RESET
 
-    "\e[1;31m",            // FLAG
+    "\e[1;31m",            // FLAG_CELL
     "\e[1m\e[38;2;0;0;0m", // BOMB
     // NUMBERS
     // 1 #0101FF
@@ -282,7 +282,7 @@ int getGameGridSize(int *gridWidth, int *gridHeight, int *nbBombs)
 
 /**
  * @brief Print a single cell
- * @param type Type of cell
+ * @param type Type of cell ()
  * @param isCursor 1 if cell is the cursor, 0 otherwise
  * @return String to print
  */
@@ -292,7 +292,7 @@ char *print_cell(int type, int isCursor)
     char *result = (char *)allocateMemory(100 * sizeof(char));
     // Choose background color depending on isCursor value
     int position = sprintf(result, "%s", backgroundColors[isCursor ? 3 : 1]);
-    if (type == -2)
+    if (type == 'f')
     {
         // Show a flag
         position += sprintf(result + position, "%s%s", foregroundColors[1], SHOW_FLAG());
@@ -346,10 +346,10 @@ int showGameGrid(int *contentGrid, const int *displayGrid, int width, int height
             // Check if current cell is the cursor
             int isCursor = (i == cursorY && j == cursorX);
 
-            if (displayGrid[i * width + j] == FLAG)
+            if (displayGrid[i * width + j] == FLAG_CELL)
             {
                 // Add a flag
-                char *cell = print_cell(-2, isCursor);
+                char *cell = print_cell('f', isCursor);
                 position += sprintf(content[i] + position, "%s", cell);
                 free(cell);
             }
@@ -408,10 +408,10 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
     char *content = (char *)allocateMemory(200 * sizeof(char));
     int position = 0;
     // Edit old cursor
-    if (displayGrid[oldCursorY * width + oldCursorX] == FLAG)
+    if (displayGrid[oldCursorY * width + oldCursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = print_cell(-2, 0);
+        char *cell = print_cell('f', 0);
         position += sprintf(content, "\e[%d;%dH%s", oldCursorY + 1, oldCursorX * 2 + 1, cell);
         free(cell);
     }
@@ -428,10 +428,10 @@ int updateGameGrid(int *contentGrid, const int *displayGrid, int width, int curs
         position += sprintf(content, "\e[%d;%dH%s  %s", oldCursorY + 1, oldCursorX * 2 + 1, backgroundColors[2], foregroundColors[0]);
     }
     // Edit new cursor
-    if (displayGrid[cursorY * width + cursorX] == FLAG)
+    if (displayGrid[cursorY * width + cursorX] == FLAG_CELL)
     {
         // Add a flag
-        char *cell = print_cell(-2, 1);
+        char *cell = print_cell('f', 1);
         position += sprintf(content + position, "\e[%d;%dH%s", cursorY + 1, cursorX * 2 + 1, cell);
         free(cell);
     }
@@ -605,7 +605,7 @@ int test()
         int x = rand() % width;
         int y = rand() % height;
         // Add flag
-        displayGrid[y * width + x] = FLAG;
+        displayGrid[y * width + x] = FLAG_CELL;
     }
 
     // Show random numbers

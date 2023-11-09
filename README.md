@@ -16,7 +16,7 @@ Pour compiler le programme principal, vous pouvez utiliser la commande suivante:
 ```bash
 gcc main.c display.c core.c generation.c constants.c -o demineur -O3
 ```
-puis exécutez le programme avec `demineur` ou `.\demineur` selon votre système d'exploitation.
+puis exécutez le programme avec `demineur` ou `./demineur` selon votre système d'exploitation.
 
 Sur windows, la librairie `windows.h` est nécessaire (Déjà installé dans de nombreux cas), et vous pouvez ajouter l'extension `.exe` au fichier compilé.
 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <time.h>
 #include "constants.h"
 #include "core.h"
@@ -14,7 +15,6 @@ int randint(int min, int max)
     int n = (rand() % (max + 1 - min)) + min;
     return n;
 }
-
 
 // prend un numero de ligne et un numero de colonne et renvoie l'entier correspondant (dans le tableau de nombredelignes lignes et de nombredecolonnes colonnes)
 int coordsEnInt(int nombredecolonnes, int ncolonne, int nligne)
@@ -62,7 +62,7 @@ void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombred
 /*cree la grille de jeu en fonction du nombre de colonnes (nombredecolonnes) du nombre de lignes (nombredelignes) et du nombre de bombes (nombredebombes) de la grille*/
 int *creeTabAvecBombes(int nombredecolonnes, int nombredelignes, int nombredebombes, int x, int y)
 {
-    int *tableau = generateTable(nombredelignes, nombredecolonnes);                       // tableau est un tableau rempli de 0.
+    int *tableau = generateTable(nombredelignes, nombredecolonnes);                         // tableau est un tableau rempli de 0.
     int nombredebombesencoreaplacer = nombredebombes % (nombredecolonnes * nombredelignes); // si le nombre de bombes est supérieur à celui de la taille de la grille on se rapporte a un nombre plus petit avec le modulo
     while (nombredebombesencoreaplacer > 0)
     {
@@ -74,7 +74,7 @@ int *creeTabAvecBombes(int nombredecolonnes, int nombredelignes, int nombredebom
             tableau[a] = BOMB;
             int tablecoordonnees[2];
             int tablevoisins[9];
-            intEnCoords(nombredecolonnes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnés de a.
+            intEnCoords(nombredecolonnes, a, tablecoordonnees);                                                                // met dans tablecoordonnee les coordonnés de a.
             listedesentierdevoisins(tablevoisins, nombredelignes, nombredecolonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a.
             for (int i = 0; i < 9; i++)
             {
@@ -101,21 +101,37 @@ void initializeGeneration()
 #ifdef TEST_GENERATION
 int test()
 {
-    int nombredelignes = 16;
-    int nombredecolonnes = 32;
-    int nombredebombe = 128;
-    printf("");
     initializeGeneration();
 
-    int *ttvide = creeTabAvecBombes(nombredelignes, nombredecolonnes, 0);
-    // ttvide est le tableau d'affichage
+    assert(coordsEnInt(10, 5, 5) == 55);
+    assert(coordsEnInt(10, 0, 0) == 0);
+    assert(coordsEnInt(10, 9, 9) == 99);
 
-    int *ttbombe = creeTabAvecBombes(nombredelignes, nombredecolonnes, nombredebombe);
-    // ttbombe est le tableau avec les bombes et les choffres
+    int position[2];
+    intEnCoords(10, 55, position);
+    assert(position[0] == 5);
+    assert(position[1] == 5);
+    intEnCoords(10, 0, position);
+    assert(position[0] == 0);
+    assert(position[1] == 0);
+    intEnCoords(10, 99, position);
+    assert(position[0] == 9);
+    assert(position[1] == 9);
 
-    // printTable(ttvide, nombredelignes, nombredecolonnes);
-    // printTable(ttbombe, nombredelignes, nombredecolonnes);
+    int *ttbombe = creeTabAvecBombes(10, 10, 20, 0, 0); // (0, 0) is the first case the player clicked on
+    assert(ttbombe[0] == 0);                            // Fisrt case must be empty, because the first case is the one the player clicked on
+    free(ttbombe);
 
+    // Check if listdesentierdevoisins works
+    int voisins[9];
+    listedesentierdevoisins(voisins, 10, 10, 1, 1);
+    assert(voisins[0] == 0);
+    assert(voisins[1] == 1);
+    assert(voisins[2] == 2);
+    assert(voisins[3] == 10);
+    assert(voisins[4] == 11);
+    assert(voisins[5] == 12);
+    assert(voisins[6] == 20);
     return 0;
 }
 int main()

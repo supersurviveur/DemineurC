@@ -1,14 +1,14 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+/**
+ * @file constants.h
+ * @brief Provides global constants for the game
+ * @authors Julien THILLARD, Clement DI-GALLO, Benjamin TRUC
+*/
 
-static char const PLACE_FLAG = 'f';
-static char const SHOW_CELL = 's';
-static int const FLAG = 2;
-static int const BOMB = -1;
-static int const HIDDEN_CELL = 0;
-static int const SHOWED_CELL = 1;
-static int const PLAYING = 0;
-static int const WON = 1;
-static int const LOST = 2;
-
-#endif // CONSTANTS_H
+extern char const ACTION_PLACE_FLAG;
+extern char const ACTION_DIG;
+extern int const FLAG;
+extern int const BOMB;
+extern int const HIDDEN_CELL;
+extern int const VISIBLE_CELL;
+extern int const WON;
+extern int const LOST;

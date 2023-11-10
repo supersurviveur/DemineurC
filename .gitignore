@@ -1,6 +1,7 @@
 # Editor files
 .vscode
 .idea
+test.* 
 
 # Prerequisites
 *.d

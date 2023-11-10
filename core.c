@@ -273,19 +273,19 @@ int test()
     int *frontTable = generateTable(rows, columns);
 
     // Mise en place du jeu sans interaction utilisateur
-    char input = 's';
+    char input = COMMAND_DOWN;
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 4);
     assert(getTableValue(frontTable, columns, 0, 4) == VISIBLE_CELL);
 
-    input = 'f';
+    input = COMMAND_PLACE_FLAG;
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 0);
     assert(getTableValue(frontTable, columns, 0, 0) == FLAG_CELL);
 
-    input = 's';
+    input = COMMAND_DOWN;
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 0, 0);
     assert(getTableValue(frontTable, columns, 0, 0) == FLAG_CELL);
 
-    input = 's';
+    input = COMMAND_DOWN;
     userInput(input, backTable, frontTable, rows, columns, bombNumbers, &gameState, 1, 1);
     assert(getTableValue(frontTable, columns, 1, 1) == VISIBLE_CELL);
 

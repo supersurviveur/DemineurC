@@ -494,28 +494,28 @@ void waitForInput(int *contentGrid, int *displayGrid, int width, int height, int
         oldY = y;
 
         // Process input
-        if (input == 'd')
+        if (input == COMMAND_RIGHT)
         {
             x++;
             // Don't go outside the grid
             if (x >= width)
                 x = width - 1;
         }
-        else if (input == 'q')
+        else if (input == COMMAND_LEFT)
         {
             x--;
             // Don't go outside the grid
             if (x < 0)
                 x = 0;
         }
-        else if (input == 'z')
+        else if (input == COMMAND_UP)
         {
             y--;
             // Don't go outside the grid
             if (y < 0)
                 y = 0;
         }
-        else if (input == 's')
+        else if (input == COMMAND_DOWN)
         {
             y++;
             // Don't go outside the grid
@@ -530,13 +530,13 @@ void waitForInput(int *contentGrid, int *displayGrid, int width, int height, int
             // Exit loop
             flag = 0;
         }
-        else if (input == 'f' || input == 'e')
+        else if (input == COMMAND_PLACE_FLAG || input == COMMAND_DIG)
         {
             // Pass cursor position in pointers
             *coordX = x;
             *coordY = y;
             // Pass action in pointer, depending on input
-            *action = input == 'f' ? ACTION_PLACE_FLAG : ACTION_DIG;
+            *action = input == COMMAND_PLACE_FLAG ? ACTION_PLACE_FLAG : ACTION_DIG;
             // Exit loop
             flag = 0;
         }

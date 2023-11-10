@@ -56,11 +56,11 @@ void recupEntiersVoisins(int *tableauVoisins, int nbLignes, int nbColonnes, int 
         for (int y = 0; y < 3; y++)
         {
             if (0 <= ligneInt + y - 1 && ligneInt + y <= nbLignes && 0 <= colonnesInt + x - 1 && colonnesInt + x <= nbColonnes)
-            { // verifie si la case existe dans le tableau 
+            { // si la case existe
                 tableauVoisins[x + 3 * y] = coordsEnInt(nbColonnes, colonnesInt + x - 1, ligneInt + y - 1);
             }
             else
-            { // sinon la case n'existe pas 
+            { // si la case ne existe pas
                 tableauVoisins[x + 3 * y] = -1;
             }
         }
@@ -79,7 +79,8 @@ void recupEntiersVoisins(int *tableauVoisins, int nbLignes, int nbColonnes, int 
 int *creeTabAvecBombes(int nbColonnes, int nbLignes, int nbBombes, int x, int y)
 {
     int *tableau = generateTable(nbLignes, nbColonnes);                   // tableau est un tableau rempli de 0.
-    while (nbBombes > 0)
+    int nbBombesAPlacer = nbBombes % (nbColonnes * nbLignes); // si le nombre de bombes est supérieur à celui de la taille de la grille on se rapporte a un nombre plus petit avec le modulo
+    while (nbBombesAPlacer > 0)
     {
         int a = randint(0, (nbColonnes * nbLignes) - 1); // a est une case du tableau
         if (                                             // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
@@ -98,7 +99,7 @@ int *creeTabAvecBombes(int nbColonnes, int nbLignes, int nbBombes, int x, int y)
                     tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisines) de 1.
                 }
             }
-            nbBombes--; // on réduit le nombre de bombes à placer, car on en à placer une
+            nbBombesAPlacer--; // on réduit le nombre de bombes à placer, car on en à placer une
         }
     }
     return tableau;

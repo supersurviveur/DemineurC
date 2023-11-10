@@ -7,6 +7,12 @@ Réalisé par [Di Gallo Clément](https://github.com/Merlode11), [Thillard Julie
 Une fois le programme lancé, le jeu va vous demander la **longueur** de la grille. Vous pouvez mettre minimum 5 cases. Vous avez aussi la possibilité de mettre 0. Le programme va alors déterminer automatiquement la taille de votre terminal pour pouvoir le remplir.
 Le jeu vous demandera de la même manière la **hauteur** de la grille, avec un minimum de 5 cases et la possibilité de remplir tout l'écran.
 Le jeu vous demandera ensuite le niveau de difficulté que vous souhaitez pour jouer. Plus le niveau de difficulté est haut, plus vous aurez de bombes à trouver.
+- `1`: 10% de bombes
+- `2`: 15% de bombes
+- `3`: 20% de bombes
+
+### But du jeu
+Le but du jeu est de trouver toutes les bombes présentes sur la grille. Pour cela, vous pouvez creuser les cases une par une. Si vous creusez une case contenant une bombe, vous perdez la partie. Si vous creusez une case ne contenant pas de bombe, un nombre apparaît sur la case. Ce nombre indique le nombre de bombes présentes sur les cases adjacentes à la case creusée. Si vous creusez toutes les cases ne contenant pas de bombe, vous gagnez la partie.
 
 ### Commandes de jeu
 - `z`: monter d'une case
@@ -16,7 +22,16 @@ Le jeu vous demandera ensuite le niveau de difficulté que vous souhaitez pour j
 - `e`: creuser la case
 - `f`: poser un drapeau sur la case
 
+Le jeu est complètement fonctionnel. Vous devrez pouvoir y jouer sans difficultés. Bonne chance !
+
 ## Compilation
+### Récupérer les fichiers
+Le projet est sous forme de fichier zip, vous pouvez le télécharger. \
+Pour décompresser le fichier, vous pouvez utiliser la commande suivante :
+```bash
+unzip DemineurC.zip
+```
+
 ### Programme principal
 Pour compiler le programme principal, vous pouvez utiliser la commande suivante:
 ```bash

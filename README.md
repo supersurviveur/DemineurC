@@ -2,7 +2,13 @@
 Projet de démineur en C pour le cours d'informatique de 1ʳᵉ année de prépa MP2I au lycée Champollion.
 Réalisé par [Di Gallo Clément](https://github.com/Merlode11), [Thillard Julien](https://github.com/supersurviveur) et [Truc Benjamin](https://github.com/TRUCBenjamin)
 
-## Commandes de jeu
+## Jouer au démineur 
+### Initialisation
+Une fois le programme lancé, le jeu va vous demander la **longueur** de la grille. Vous pouvez mettre minimum 5 cases. Vous avez aussi la possibilité de mettre 0. Le programme va alors déterminer automatiquement la taille de votre terminal pour pouvoir le remplir.
+Le jeu vous demandera de la même manière la **hauteur** de la grille, avec un minimum de 5 cases et la possibilité de remplir tout l'écran.
+Le jeu vous demandera ensuite le niveau de difficulté que vous souhaitez pour jouer. Plus le niveau de difficulté est haut, plus vous aurez de bombes à trouver.
+
+### Commandes de jeu
 - `z`: monter d'une case
 - `q`: aller à gauche d'une case
 - `s`: descendre d'une case
@@ -10,7 +16,7 @@ Réalisé par [Di Gallo Clément](https://github.com/Merlode11), [Thillard Julie
 - `e`: creuser la case
 - `f`: poser un drapeau sur la case
 
-# Compilation
+## Compilation
 ### Programme principal
 Pour compiler le programme principal, vous pouvez utiliser la commande suivante:
 ```bash

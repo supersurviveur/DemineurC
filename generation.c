@@ -33,31 +33,31 @@ int coordsEnInt(int nbColonnes, int colonne, int ligne)
  * @brief Rempli un tableau de 2 entiers avec les coordonnées de la cellule de numéro n dans un tableau de nbColonnes colonnes (ligne, colonne)
  * @param nbColonnes Nombre de colonnes du tableau
  * @param n Numéro de la cellule dont on cherche les coordonnées
- * @param pointeurCoordonnees Pointeur vers un tableau de 2 entiers
+ * @param pointeurCoords Pointeur vers un tableau de 2 entiers
  */
-void intEnCoords(int nbColonnes, int n, int *pointeurCoordonnees)
+void intEnCoords(int nbColonnes, int n, int *pointeurCoords)
 {
-    pointeurCoordonnees[0] = n / nbColonnes;
-    pointeurCoordonnees[1] = n % nbColonnes;
+    pointeurCoords[0] = n / nbColonnes;
+    pointeurCoords[1] = n % nbColonnes;
 }
 
 /**
- * @brief Rempli un tableau de 9 entiers avec les coordonnées des cellules voisines à la cellule de coordonnées (lignedeint, colonnedeint)
+ * @brief Rempli un tableau de 9 entiers avec les coordonnées des cellules voisines à la cellule de coordonnées (ligneInt, colonnesInt)
  * @param tableauVoisins Tableau de 9 entiers
  * @param nbLignes Nombre de lignes du tableau
  * @param nbColonnes Nombre de colonnes du tableau
- * @param lignedeint Ligne de la cellule dont on cherche les voisins
- * @param colonnedeint Colonne de la cellule dont on cherche les voisins
+ * @param ligneInt Ligne de la cellule dont on cherche les voisins
+ * @param colonnesInt Colonne de la cellule dont on cherche les voisins
  */
-void listedesentierdevoisins(int *tableauVoisins, int nbLignes, int nbColonnes, int lignedeint, int colonnedeint)
+void recupEntiersVoisins(int *tableauVoisins, int nbLignes, int nbColonnes, int ligneInt, int colonnesInt)
 {
     for (int x = 0; x < 3; x++)
     {
         for (int y = 0; y < 3; y++)
         {
-            if (0 <= lignedeint + y - 1 && lignedeint + y <= nbLignes && 0 <= colonnedeint + x - 1 && colonnedeint + x <= nbColonnes)
+            if (0 <= ligneInt + y - 1 && ligneInt + y <= nbLignes && 0 <= colonnesInt + x - 1 && colonnesInt + x <= nbColonnes)
             { // si la case existe
-                tableauVoisins[x + 3 * y] = coordsEnInt(nbColonnes, colonnedeint + x - 1, lignedeint + y - 1);
+                tableauVoisins[x + 3 * y] = coordsEnInt(nbColonnes, colonnesInt + x - 1, ligneInt + y - 1);
             }
             else
             { // si la case ne existe pas
@@ -79,27 +79,27 @@ void listedesentierdevoisins(int *tableauVoisins, int nbLignes, int nbColonnes, 
 int *creeTabAvecBombes(int nbColonnes, int nbLignes, int nbBombes, int x, int y)
 {
     int *tableau = generateTable(nbLignes, nbColonnes);                   // tableau est un tableau rempli de 0.
-    int nombredebombesencoreaplacer = nbBombes % (nbColonnes * nbLignes); // si le nombre de bombes est supérieur à celui de la taille de la grille on se rapporte a un nombre plus petit avec le modulo
-    while (nombredebombesencoreaplacer > 0)
+    int nbBombesAPlacer = nbBombes % (nbColonnes * nbLignes); // si le nombre de bombes est supérieur à celui de la taille de la grille on se rapporte a un nombre plus petit avec le modulo
+    while (nbBombesAPlacer > 0)
     {
         int a = randint(0, (nbColonnes * nbLignes) - 1); // a est une case du tableau
         if (                                             // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
             tableau[a] != BOMB && (a < coordsEnInt(nbColonnes, x - 1, y - 1) || a > coordsEnInt(nbColonnes, x + 1, y - 1)) && (a < coordsEnInt(nbColonnes, x - 1, y) || a > coordsEnInt(nbColonnes, x + 1, y)) && (a < coordsEnInt(nbColonnes, x - 1, y + 1) || a > coordsEnInt(nbColonnes, x + 1, y + 1)))
         {
             tableau[a] = BOMB;
-            int tablecoordonnees[2];
-            int tablevoisins[9];
-            intEnCoords(nbColonnes, a, tablecoordonnees);                                                          // met dans tablecoordonnee les coordonnés de a.
-            listedesentierdevoisins(tablevoisins, nbLignes, nbColonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a.
+            int tabCoords[2];
+            int tabVoisins[9];
+            intEnCoords(nbColonnes, a, tabCoords);                                                          // met dans tablecoordonnee les coordonnés de a.
+            recupEntiersVoisins(tabVoisins, nbLignes, nbColonnes, tabCoords[0], tabCoords[1]); // met dans tablevoisin les voisins de a.
             for (int i = 0; i < 9; i++)
             {
-                int b = tablevoisins[i];
+                int b = tabVoisins[i];
                 if (b != -1 && tableau[b] != BOMB)
                 {
                     tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisines) de 1.
                 }
             }
-            nombredebombesencoreaplacer--; // on réduit le nombre de bombes à placer, car on en à placer une
+            nbBombesAPlacer--; // on réduit le nombre de bombes à placer, car on en à placer une
         }
     }
     return tableau;
@@ -139,7 +139,7 @@ int test()
 
     // Check if listdesentierdevoisins works
     int voisins[9];
-    listedesentierdevoisins(voisins, 10, 10, 1, 1);
+    recupEntiersVoisins(voisins, 10, 10, 1, 1);
     assert(voisins[0] == 0);
     assert(voisins[1] == 1);
     assert(voisins[2] == 2);

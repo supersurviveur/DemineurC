@@ -6,4 +6,9 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(DemineurC
-        main.c display.c core.c generation.c constants.c)
+        main.c
+        display.c
+        core.c
+        generation.c
+        constants.c
+)

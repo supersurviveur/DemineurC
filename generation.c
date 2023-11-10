@@ -1,144 +1,158 @@
-#include <malloc.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 #include <time.h>
 #include "constants.h"
+#include "core.h"
 
 /**
- * @brief Génère un nombre entier aleatoire entre min (inclus) et max (exclus)
+ * @brief Génère un nombre entier aléatoire entre min (inclus) et max (inclus)
  * @param min Valeur minimale
  * @param max Valeur maximale
- * @return Le nombre aleatoire généré
+ * @return Le nombre aléatoire généré
  */
-int randomint(int min, int max)
+int randint(int min, int max)
 {
     int n = (rand() % (max + 1 - min)) + min;
     return n;
 }
 
-// prend un numero de ligne et un numero de colonne et renvoie l'entier correspondant (dans le tableau de nombredelignes lignes et de nombredecolonnes colonnes)
-int coordonneesenint(int nombredelignes, int nombredecolonnes, int ncolonne, int nligne)
+/**
+ * @brief Convertis les coordonnées d'une cellule en un entier qui correspond à sa position dans un tableau linéarisé
+ * @param nbColonnes Nombre de colonnes du tableau
+ * @param colonne Colonne de la cellule
+ * @param ligne Ligne de la cellule
+ * @return L'entier correspondant à la position de la cellule dans le tableau linéarisé
+ */
+int coordsEnInt(int nbColonnes, int colonne, int ligne)
 {
-    if (nombredecolonnes <= nligne)
-    {
-        nligne = nombredecolonnes;
-    }
-    return nligne * nombredelignes + ncolonne;
+    return ligne * nbColonnes + colonne;
 }
 
-// prend un entier et met change la valeur du poiteur en le numero de la ligne pour la premiere valeur et le numero de la colonne pour la seconde
-void intencoordonnees(int nombredelignes, int n, int *pointeurcoordonnees)
+/**
+ * @brief Rempli un tableau de 2 entiers avec les coordonnées de la cellule de numéro n dans un tableau de nbColonnes colonnes (ligne, colonne)
+ * @param nbColonnes Nombre de colonnes du tableau
+ * @param n Numéro de la cellule dont on cherche les coordonnées
+ * @param pointeurCoords Pointeur vers un tableau de 2 entiers
+ */
+void intEnCoords(int nbColonnes, int n, int *pointeurCoords)
 {
-    pointeurcoordonnees[0] = n / nombredelignes;
-    pointeurcoordonnees[1] = n % nombredelignes;
+    pointeurCoords[0] = n / nbColonnes;
+    pointeurCoords[1] = n % nbColonnes;
 }
 
-// cree et renvoie un tableau renplie de 0 de taille nombredelignes * nombredecolonnes
-int *creetableauvide(int nombredelignes, int nombredecolonnes)
-{
-    int *table = (int *)malloc(nombredelignes * nombredecolonnes * sizeof(int));
-    if (table == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < nombredelignes * nombredecolonnes; i++)
-    {
-        table[i] = 0;
-    }
-    return table;
-}
-
-/*
-entrees :
-    tableauvoisin : un tableau de 9 entier NECESSAIREMENT!!!!
-    nombredelignes : nombres de lignes du tableau
-    nombredecolonnes : nombres de colonnes du tableau
-    lignedeint : ligne de la case dont on cherche les coordonnees des voisines orthoganalement et diagonalement
-    colonndeint : colonne de la case dont on cherche les coordonnees des voisines orthoganalement et diagonalement
-
-change les valeurs de tableauvoisin pour obtenir un tableau de neuf entiers correspondant aux valeurs des voisins
-        si il existe dans le tableau
-        si la case ne existe pas, c'est la valeur de notre case qui y sera a la place
-*/
-void listedesentierdevoisins(int *tableauvoisin, int nombredelignes, int nombredecolonnes, int lignedeint, int colonnedeint)
+/**
+ * @brief Rempli un tableau de 9 entiers avec les coordonnées des cellules voisines à la cellule de coordonnées (ligneInt, colonnesInt)
+ * @param tableauVoisins Tableau de 9 entiers
+ * @param nbLignes Nombre de lignes du tableau
+ * @param nbColonnes Nombre de colonnes du tableau
+ * @param ligneInt Ligne de la cellule dont on cherche les voisins
+ * @param colonnesInt Colonne de la cellule dont on cherche les voisins
+ */
+void recupEntiersVoisins(int *tableauVoisins, int nbLignes, int nbColonnes, int ligneInt, int colonnesInt)
 {
     for (int x = 0; x < 3; x++)
     {
         for (int y = 0; y < 3; y++)
         {
-            if (0 <= lignedeint + y - 1 && lignedeint + y <= nombredecolonnes && 0 <= colonnedeint + x - 1 && colonnedeint + x <= nombredelignes)
+            if (0 <= ligneInt + y - 1 && ligneInt + y <= nbLignes && 0 <= colonnesInt + x - 1 && colonnesInt + x <= nbColonnes)
             { // si la case existe
-                tableauvoisin[x + 3 * y] = coordonneesenint(nombredelignes, nombredecolonnes, colonnedeint + x - 1, lignedeint + y - 1);
+                tableauVoisins[x + 3 * y] = coordsEnInt(nbColonnes, colonnesInt + x - 1, ligneInt + y - 1);
             }
             else
             { // si la case ne existe pas
-                tableauvoisin[x + 3 * y] = -1;
+                tableauVoisins[x + 3 * y] = -1;
             }
         }
     }
 }
 
-/*cree la grille de jeu en fonction du nombre de colonnes (nombredecolonnes) du nombre de lignes (nombredelignes) et du nombre de bombes (nombredebombes) de la grille*/
-int *creetableauaveclesbombes(int nombredecolonnes, int nombredelignes, int nombredebombes, int x, int y)
+/**
+ * @brief Génère un tableau de nbLignes lignes et de nbColonnes colonnes, puis le rempli avec nbBombs bombes
+ * @param nbColonnes Nombre de colonnes du tableau
+ * @param nbLignes Nombre de lignes du tableau
+ * @param nbBombes Nombre de bombes à placer dans le tableau
+ * @param x Coordonnée x de la première case cliquée par le joueur
+ * @param y Coordonnée y de la première case cliquée par le joueur
+ * @return Un tableau linéarisé de taille nbColonnes * nbLignes, contenant les bombes et les nombres de bombes voisines
+ */
+int *creeTabAvecBombes(int nbColonnes, int nbLignes, int nbBombes, int x, int y)
 {
-    int *tableau = creetableauvide(nombredelignes, nombredecolonnes);                       // tableau est un tableau rempli de 0
-    int nombredebombesencoreaplacer = nombredebombes % (nombredecolonnes * nombredelignes); // si le nombre de bombes est superieur a celui de la taille de la grille on se raporte a un nombre plus petit avec le modulo
-    while (nombredebombesencoreaplacer > 0)
+    int *tableau = generateTable(nbLignes, nbColonnes);                   // tableau est un tableau rempli de 0.
+    int nbBombesAPlacer = nbBombes % (nbColonnes * nbLignes); // si le nombre de bombes est supérieur à celui de la taille de la grille on se rapporte a un nombre plus petit avec le modulo
+    while (nbBombesAPlacer > 0)
     {
-        int a = randomint(0, (nombredecolonnes * nombredelignes) - 1); // a est une case du tableau
-        if (
-            tableau[a] != BOMB && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y + 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x + 1, y - 1) && a != coordonneesenint(nombredelignes, nombredecolonnes, x - 1, y + 1) // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
-        )
+        int a = randint(0, (nbColonnes * nbLignes) - 1); // a est une case du tableau
+        if (                                             // si la case n'est pas une bombe et n'est pas une case voisine de la case de depart (x,y)
+            tableau[a] != BOMB && (a < coordsEnInt(nbColonnes, x - 1, y - 1) || a > coordsEnInt(nbColonnes, x + 1, y - 1)) && (a < coordsEnInt(nbColonnes, x - 1, y) || a > coordsEnInt(nbColonnes, x + 1, y)) && (a < coordsEnInt(nbColonnes, x - 1, y + 1) || a > coordsEnInt(nbColonnes, x + 1, y + 1)))
         {
             tableau[a] = BOMB;
-            int tablecoordonnees[2];
-            int tablevoisins[9];
-            intencoordonnees(nombredelignes, a, tablecoordonnees);                                                             // met dans tablecoordonnee les coordonnes de a
-            listedesentierdevoisins(tablevoisins, nombredelignes, nombredecolonnes, tablecoordonnees[0], tablecoordonnees[1]); // met dans tablevoisin les voisins de a
+            int tabCoords[2];
+            int tabVoisins[9];
+            intEnCoords(nbColonnes, a, tabCoords);                                                          // met dans tablecoordonnee les coordonnés de a.
+            recupEntiersVoisins(tabVoisins, nbLignes, nbColonnes, tabCoords[0], tabCoords[1]); // met dans tablevoisin les voisins de a.
             for (int i = 0; i < 9; i++)
             {
-                int b = tablevoisins[i];
+                int b = tabVoisins[i];
                 if (b != -1 && tableau[b] != BOMB)
                 {
-                    tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisine) de 1
+                    tableau[b] = tableau[b] + 1; // pour chaque voisin de a (qui n'est pas une bombe), on augmente la valeur (correspondant au nombre de bombes voisines) de 1.
                 }
             }
-            nombredebombesencoreaplacer = nombredebombesencoreaplacer - 1; // on reduit le nombre de bombes a placer car on en a placer une
+            nbBombesAPlacer--; // on réduit le nombre de bombes à placer, car on en à placer une
         }
     }
     return tableau;
 }
 
 /**
- * @brief Initialize raandom generation
+ * @brief Initialize random generation
  */
-void initializeGeneration(void)
+void initializeGeneration()
 {
-    srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombre pseudo-aleatoire a la valeur du temps pour ne pas avoir toujour la meme grille
+    srand((unsigned int)time(NULL)); // initialisation du debut de liste des nombres pseudo-aléatoire a la valeur du temps pour ne pas avoir toujours la meme grille
 }
 
-#ifdef TEST
+#ifdef TEST_GENERATION
 int test()
 {
-    int nombredelignes = 16;
-    int nombredecolonnes = 32;
-    int nombredebombe = 128;
-    printf("");
     initializeGeneration();
 
-    int *ttvide = creetableauaveclesbombes(nombredelignes, nombredecolonnes, 0);
-    // ttvide est le tableau d'affichage
+    assert(coordsEnInt(10, 5, 5) == 55);
+    assert(coordsEnInt(10, 0, 0) == 0);
+    assert(coordsEnInt(10, 9, 9) == 99);
 
-    int *ttbombe = creetableauaveclesbombes(nombredelignes, nombredecolonnes, nombredebombe);
-    // ttbombe est le tableau avec les bombes et les choffres
+    int position[2];
+    intEnCoords(10, 55, position);
+    assert(position[0] == 5);
+    assert(position[1] == 5);
+    intEnCoords(10, 0, position);
+    assert(position[0] == 0);
+    assert(position[1] == 0);
+    intEnCoords(10, 99, position);
+    assert(position[0] == 9);
+    assert(position[1] == 9);
 
-    // printTable(ttvide, nombredelignes, nombredecolonnes);
-    // printTable(ttbombe, nombredelignes, nombredecolonnes);
+    int *ttbombe = creeTabAvecBombes(10, 10, 20, 0, 0); // (0, 0) is the first case the player clicked on
+    assert(ttbombe[0] == 0);                            // Fisrt case must be empty, because the first case is the one the player clicked on
+    free(ttbombe);
 
+    // Check if listdesentierdevoisins works
+    int voisins[9];
+    recupEntiersVoisins(voisins, 10, 10, 1, 1);
+    assert(voisins[0] == 0);
+    assert(voisins[1] == 1);
+    assert(voisins[2] == 2);
+    assert(voisins[3] == 10);
+    assert(voisins[4] == 11);
+    assert(voisins[5] == 12);
+    assert(voisins[6] == 20);
+
+    printf("Tests passed successfully\n");
     return 0;
 }
 int main()
 {
     return test();
 }
-#endif
+#endif // TEST_GENERATION

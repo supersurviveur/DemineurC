@@ -376,7 +376,7 @@ void showGameGrid(int *contentGrid, const int *displayGrid, int width, int heigh
     }
     position += sprintf(result + position, "\n");
     // Finally, show the entire grid in one call
-    fwrite(result, position, 1, stdout);
+    fwrite(result, position, 1, stdout); // Equivalent to printf, but without format
 
     // Free memory
     for (int i = 0; i < height; i++)
@@ -456,7 +456,7 @@ void updateGameGrid(int *contentGrid, const int *displayGrid, int width, int cur
         position += sprintf(content + position, "  %s", foregroundColors[0]);
     }
     // Show changes
-    fwrite(content, position, 1, stdout);
+    fwrite(content, position, 1, stdout); // Equivalent to printf, but without format
     // Free memory
     free(content);
 }

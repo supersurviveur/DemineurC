@@ -108,8 +108,8 @@ void getTerminalSize(int *width, int *height)
         exit(EXIT_FAILURE);
     }
     // Pointer get the value-2, to be sure to fit in the size of the console
-    *width = csbi.dwSize.X - 2;
-    *height = csbi.dwSize.Y - 2;
+    *width = csbi.srWindow.Right - csbi.srWindow.Left - 2;
+    *height = csbi.srWindow.Bottom - csbi.srWindow.Top - 2;
 }
 #else
 // On linux, we need to use a custom function to get input without pressing enter
